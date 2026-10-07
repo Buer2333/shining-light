@@ -1,0 +1,58 @@
+{
+  "_comment": "示例配置：只有结构。真值本地放 personal/ip/tools/site_gate.config.json，CI 用 GitHub secret SITE_GATE_CONFIG（整份 JSON）注入。brands 为空 ⇒ 闸 FAIL。",
+  "brands": [],
+  "email_allowlist": [],
+  "fuzzy_number_allowlist": [],
+  "forbidden_ext": [
+    ".pdf",
+    ".docx",
+    ".doc",
+    ".m4a",
+    ".wav",
+    ".mp3",
+    ".mp4",
+    ".mov"
+  ],
+  "forbidden_name_regex": [
+    "简历.*\\.html?$",
+    "^resume.*\\.html?$"
+  ],
+  "image_ext": [
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".webp"
+  ],
+  "text_ext": [
+    ".md",
+    ".mdx",
+    ".txt",
+    ".html",
+    ".htm",
+    ".js",
+    ".mjs",
+    ".cjs",
+    ".ts",
+    ".css",
+    ".json",
+    ".xml",
+    ".svg",
+    ".yml",
+    ".yaml",
+    ".csv",
+    ".astro",
+    ".map",
+    ".webmanifest"
+  ],
+  "allowed_binary_ext": [
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".otf",
+    ".ico"
+  ],
+  "skip_dirs": [
+    ".git"
+  ]
+}

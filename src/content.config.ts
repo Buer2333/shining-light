@@ -8,6 +8,7 @@ import { PILLARS } from './lib/site';
 // (CI) never set it, so samples never reach dist/.
 const INCLUDE_SAMPLES = process.env.SITE_INCLUDE_SAMPLES === '1';
 
+// ext is a glob alternation such as '{md,json}' (exporter writes json for diary/works).
 const patterns = (name: string, ext: string) => [
   `${name}/**/*.${ext}`,
   ...(INCLUDE_SAMPLES ? [`_samples/${name}/*.${ext}`] : []),
@@ -31,7 +32,13 @@ const isoDateTime = z.preprocess(
 
 const metric = z.number().nonnegative().nullable().default(null);
 
-const sample = z.object({
+// The exporter nests the numbers under `metrics`; hoist them to the top level.
+const flattenMetrics = (v: unknown) =>
+  v && typeof v === 'object' && 'metrics' in v
+    ? { ...(v as Record<string, unknown>).metrics as object, ...(v as object), metrics: undefined }
+    : v;
+
+const sample = z.preprocess(flattenMetrics, z.object({
   platform: z.enum(['xhs', 'douyin']),
   sampled_at: isoDateTime,
   hours_since_publish: z.number().nonnegative(),
@@ -45,7 +52,7 @@ const sample = z.object({
   shares: metric,
   completion_rate: metric, // 0–1
   followers_gained: metric,
-});
+}));
 
 const platformEntry = z.object({
   title: z.string().default(''),
@@ -55,7 +62,7 @@ const platformEntry = z.object({
 });
 
 const diary = defineCollection({
-  loader: glob({ base: './src/content', pattern: patterns('diary', 'md'), generateId: idFromFile }),
+  loader: glob({ base: './src/content', pattern: patterns('diary', '{md,json}'), generateId: idFromFile }),
   schema: z.object({
     no: z.string(),
     slug: z.string(),
@@ -89,13 +96,16 @@ const brandlab = defineCollection({
 });
 
 const works = defineCollection({
-  loader: glob({ base: './src/content', pattern: patterns('works', 'md'), generateId: idFromFile }),
+  loader: glob({ base: './src/content', pattern: patterns('works', '{md,json}'), generateId: idFromFile }),
   schema: z.object({
     no: z.string(),
     title: z.string(),
     slug: z.string(),
-    pillar: z.enum(PILLARS),
+    pillar: z.enum(PILLARS).optional(),
     notes: z.string().default(''),
+    iterations: z
+      .array(z.object({ tag: z.string(), date: z.string(), note: z.string() }))
+      .default([]),
     sample: z.boolean().default(false),
   }),
 });

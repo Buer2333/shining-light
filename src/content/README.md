@@ -4,19 +4,20 @@
 
 | 目录 | 集合 | 文件 | 页面 |
 |---|---|---|---|
-| `diary/` | 发布日记 | `{slug}.md` | `/diary/`、`/diary/{slug}/` |
+| `diary/` | 发布日记 | `{文件名}.json`（也接受 `.md`） | `/diary/`、`/diary/{slug}/` |
 | `brandlab/` | 品牌拆解库 | `{slug}.md` | `/brandlab/`、`/brandlab/{slug}/` |
-| `works/` | 作品 | `{slug}.md` | `/works/`（锚点 `#{slug}`） |
-| `resume/` | 简历设计路径 | 目前不导出 | `/resume/` 固定为「整理中」占位页 |
+| `works/` | 作品 | `{slug}.json`（也接受 `.md`） | `/works/`（锚点 `#{slug}`） |
+| `resume/` | 简历设计路径 | `index.md`，导出脚本写固定占位（`status: placeholder`） | `/resume/` 固定为「整理中」占位页 |
 | `_samples/` | 合成示例 | 每个集合一条假数据 | 只在 `SITE_INCLUDE_SAMPLES=1` 时加载；CI 生产构建不设，示例不会进 `dist/` |
 
 条目 id = front-matter 的 `slug`（没有则用文件名）。同一集合内 slug 必须唯一。
 
 ## diary（发布日记）
 
-Front-matter 沿用私有仓库的发布日记模板，导出时：
+导出脚本写 JSON（字段同下方 YAML 示例，键名一一对应），导出时：
 - `public: false` 的条目**不导出**（站点也会再过滤一次）。
 - `platforms.*.video`（本地视频路径）和 `version_tag` 应删掉；schema 允许缺省，页面不渲染它们。
+- 额外字段（如 `date`、样本的 `label`）会被 schema 忽略；样本的指标由导出脚本放在 `samples[].metrics{}` 下，站点读取时摊平成顶层；缺的指标不写，页面显示「未采」。
 - 尚未填写的字符串字段可以是 `""`，`url` / `published_at` 的 `""` 会被当成 null。
 
 ```yaml
@@ -61,7 +62,7 @@ brand: string
 category: string
 tags: [string, ...]
 date: 2026-10-07                # YYYY-MM-DD
-summary: string                 # 一两句，列表页和搜索用
+summary: string                 # 一两句，列表页和搜索用（导出脚本取「一句话看点」首段，≤120 字）
 ```
 正文：markdown（只放学习层结论，不放内部数据）。
 
@@ -71,14 +72,16 @@ summary: string                 # 一两句，列表页和搜索用
 no: NO.01
 title: string
 slug: string
-pillar: 同 diary
-notes: string                   # 一句话说明
+pillar: 同 diary                 # 可选（导出的 works 目前不带）
+notes: string                   # 可选，一句话说明
+iterations:                     # 导出脚本写，每版一条
+  - { tag: ep02-v4, date: "10-05", note: "…" }
 ```
-正文：markdown，写迭代过程。视频本体只链接到平台，不放文件。
+JSON 无正文；迭代过程由 `iterations` 渲染。手写 `.md` 时正文写 markdown。视频本体只链接到平台，不放文件。
 
 ## resume（简历设计路径）
 
-首推只放占位页，不导出内容。时间线经单独审批后再定 schema；当前 schema 只接受 `title` + `status: placeholder`。
+首推只放占位页：导出脚本固定写 `resume/index.md`，front-matter 为 `title` + `status: placeholder`（schema 只接受该字面值）。时间线经单独审批后再定 schema。
 
 ## 通用约束
 
