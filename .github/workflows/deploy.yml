@@ -40,6 +40,7 @@ jobs:
       - name: Site gate
         env:
           SITE_GATE_PII_TERMS: ${{ secrets.SITE_GATE_PII_TERMS }}
+          SITE_GATE_CONFIG: ${{ secrets.SITE_GATE_CONFIG }}
         run: |
           if [ ! -f tools/site_gate.py ]; then
             echo "::error::tools/site_gate.py missing — refusing to deploy (see tools/README.md)"
