@@ -1,0 +1,41 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const entries = (await getCollection('works')).sort((a, b) =>
+  b.data.no.localeCompare(a.data.no, 'zh-CN', { numeric: true }),
+);
+const rendered = await Promise.all(entries.map(async (e) => ({ e, ...(await render(e)) })));
+---
+
+<Base title="作品" description="Shining 每一期作品的迭代过程。">
+  <h1>作品</h1>
+  <p class="muted">每一期是怎么一版版改出来的。视频本体在平台上，这里只放过程。</p>
+  {
+    rendered.length === 0 ? (
+      <p class="empty">整理中。</p>
+    ) : (
+      <ul class="list">
+        {rendered.map(({ e, Content }) => (
+          <li class="card" id={e.data.slug}>
+            <p class="meta">
+              {e.data.no} · {e.data.pillar}
+              {e.data.sample && ' · 示例数据'}
+            </p>
+            <h2 class="work-title">{e.data.title}</h2>
+            {e.data.notes && <p>{e.data.notes}</p>}
+            <div class="prose">
+              <Content />
+            </div>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</Base>
+
+<style>
+  .work-title {
+    margin: 4px 0;
+  }
+</style>

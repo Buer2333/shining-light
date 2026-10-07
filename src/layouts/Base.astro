@@ -1,0 +1,104 @@
+---
+import '@fontsource/jetbrains-mono/400.css';
+import '../styles/global.css';
+import { url } from '../lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = 'Shining · 拆大牌广告创意，照亮最要紧的那一处。' } = Astro.props;
+const fullTitle = title ? `${title} · Shining` : 'Shining';
+const path = Astro.url.pathname;
+const nav = [
+  ['diary/', '发布日记'],
+  ['brandlab/', '品牌拆解库'],
+  ['works/', '作品'],
+  ['resume/', '简历设计路径'],
+] as const;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#FFF7E9" />
+    <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+    <title>{fullTitle}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap bar">
+        <a class="wordmark" href={url()}>Shining</a>
+        <span class="meta series">HIGHLIGHT</span>
+      </div>
+      <nav class="wrap nav" aria-label="栏目">
+        {
+          nav.map(([href, label]) => (
+            <a href={url(href)} aria-current={path.startsWith(url(href)) ? 'page' : undefined}>
+              {label}
+            </a>
+          ))
+        }
+      </nav>
+    </header>
+    <main class="wrap">
+      <slot />
+    </main>
+    <footer class="wrap site-footer">
+      <p class="meta"><em>shining a light on what matters</em></p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--rule);
+    padding-top: 14px;
+  }
+  .bar {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .wordmark {
+    font-family: var(--font-display);
+    font-size: 30px;
+    color: var(--field);
+    text-decoration: none;
+    /* 字标下那截常驻光带 */
+    background: linear-gradient(transparent 70%, var(--marker) 70%, var(--marker) 92%, transparent 92%);
+    line-height: 1.2;
+  }
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    padding-top: 6px;
+    padding-bottom: 10px;
+  }
+  .nav a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 15px;
+    border-bottom: 2px solid transparent;
+  }
+  .nav a[aria-current='page'] {
+    color: var(--field);
+    border-bottom-color: var(--field);
+  }
+  main {
+    padding-bottom: 48px;
+    min-height: 60vh;
+  }
+  .site-footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
+    padding-bottom: 24px;
+  }
+</style>

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+*.mp4
+*.wav
+*.pdf
+*.docx
+.env
+.env.*

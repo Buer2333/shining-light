@@ -1,0 +1,146 @@
+---
+import { METRICS, PILLARS, PLATFORM_LABEL } from '../lib/site';
+
+export interface Row {
+  series: string; // "NO.01 · 小红书"
+  no: string;
+  title: string;
+  pillar: string;
+  platform: string;
+  hours: number;
+  bucket: string;
+  [metric: string]: string | number | null;
+}
+
+interface Props {
+  rows: Row[];
+}
+
+const { rows } = Astro.props;
+const pillars = PILLARS.filter((p) => rows.some((r) => r.pillar === p));
+const platforms = Object.keys(PLATFORM_LABEL).filter((p) => rows.some((r) => r.platform === p));
+---
+
+<section class="chart-block" data-diary-chart>
+  <div class="controls">
+    <label>
+      指标
+      <select name="metric">
+        {METRICS.map(([key, label]) => <option value={key}>{label}</option>)}
+      </select>
+    </label>
+    <label>
+      支柱
+      <select name="pillar">
+        <option value="">全部</option>
+        {pillars.map((p) => <option value={p}>{p}</option>)}
+      </select>
+    </label>
+    <label>
+      平台
+      <select name="platform">
+        <option value="">全部</option>
+        {platforms.map((p) => <option value={p}>{PLATFORM_LABEL[p]}</option>)}
+      </select>
+    </label>
+  </div>
+  <div class="plot" aria-live="polite"></div>
+  <p class="meta note">横轴 = 发布后实测小时数（不按 24h / 72h / 7d 取整）；未采的点不画，不插值。</p>
+  <script type="application/json" data-rows set:html={JSON.stringify(rows).replace(/</g, '\\u003c')} />
+</section>
+
+<script>
+  import * as Plot from '@observablehq/plot';
+
+  const LABEL: Record<string, string> = {
+    views: '播放',
+    likes: '点赞',
+    collects: '收藏',
+    comments: '评论',
+    shares: '分享',
+    completion_rate: '完播率',
+    followers_gained: '涨粉',
+  };
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-diary-chart]')) {
+    const rows = JSON.parse(root.querySelector('[data-rows]')!.textContent || '[]') as Record<
+      string,
+      any
+    >[];
+    const out = root.querySelector<HTMLElement>('.plot')!;
+    const sel = (n: string) => root.querySelector<HTMLSelectElement>(`select[name="${n}"]`)!;
+
+    const render = () => {
+      const metric = sel('metric').value;
+      const pillar = sel('pillar').value;
+      const platform = sel('platform').value;
+      const data = rows
+        .filter((r) => (!pillar || r.pillar === pillar) && (!platform || r.platform === platform))
+        .filter((r) => r[metric] !== null && r[metric] !== undefined)
+        .sort((a, b) => a.hours - b.hours);
+
+      out.replaceChildren();
+      if (data.length === 0) {
+        const p = document.createElement('p');
+        p.className = 'empty';
+        p.textContent = '这个筛选下还没有采样数据。';
+        out.append(p);
+        return;
+      }
+      const pct = metric === 'completion_rate';
+      out.append(
+        Plot.plot({
+          width: Math.min(out.clientWidth || 640, 880),
+          height: 320,
+          marginLeft: 56,
+          style: { background: 'transparent', color: '#141A4D', fontSize: '12px' },
+          x: { label: '发布后实测小时 →', grid: true },
+          y: { label: `↑ ${LABEL[metric]}`, grid: true, tickFormat: pct ? '.0%' : '~s' },
+          color: { legend: true, scheme: 'tableau10' },
+          marks: [
+            Plot.ruleY([0]),
+            Plot.line(data, { x: 'hours', y: metric, stroke: 'series', strokeWidth: 2 }),
+            Plot.dot(data, { x: 'hours', y: metric, fill: 'series', r: 3.5 }),
+            Plot.tip(
+              data,
+              Plot.pointer({
+                x: 'hours',
+                y: metric,
+                title: (d: any) =>
+                  `${d.series}\n${d.title}\n实测 ${d.hours.toFixed(1)}h\n${LABEL[metric]}：${
+                    pct ? (d[metric] * 100).toFixed(1) + '%' : d[metric].toLocaleString('zh-CN')
+                  }`,
+              }),
+            ),
+          ],
+        }),
+      );
+    };
+
+    root.querySelectorAll('select').forEach((s) => s.addEventListener('change', render));
+    window.addEventListener('resize', () => requestAnimationFrame(render));
+    render();
+  }
+</script>
+
+<style>
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .controls label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .plot {
+    overflow-x: auto;
+    min-height: 80px;
+  }
+  .note {
+    margin-top: 6px;
+  }
+</style>

@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/site';
+
+const diary = (await getCollection('diary')).filter((e) => e.data.public);
+const brandlab = await getCollection('brandlab');
+const works = await getCollection('works');
+
+const sections = [
+  ['diary/', '发布日记', '每期发出去之后的数据：按实测小时数记录，没采到就写「未采」，不估不补。', diary.length],
+  ['brandlab/', '品牌拆解库', '一个品牌一页：它的广告创意里，真正起作用的是哪一处。', brandlab.length],
+  ['works/', '作品', '每一期是怎么改出来的。视频本体在平台上，这里只放过程。', works.length],
+  ['resume/', '简历设计路径', '整理中。', null],
+] as const;
+---
+
+<Base>
+  <section class="hero">
+    <p class="meta">SHINING · HIGHLIGHT</p>
+    <h1>拆大牌广告创意，<span class="hl">照亮最要紧的那一处</span>。</h1>
+    <p class="lead">
+      我是 Shining，一个写过代码的电商操盘手。每一期挑一个品牌或一件业务里的事，在一大堆细节里只划一处重点。
+      这个站是公开的工作笔记：发了什么、数据怎么样、拆过哪些品牌、作品怎么一版版改过来。
+    </p>
+  </section>
+
+  <ul class="list sections">
+    {
+      sections.map(([href, label, desc, n]) => (
+        <li class="card">
+          <a class="title" href={url(href)}>
+            {label}
+          </a>
+          {n !== null && <span class="meta"> · {n} 篇</span>}
+          <p class="muted">{desc}</p>
+        </li>
+      ))
+    }
+  </ul>
+</Base>
+
+<style>
+  .hero {
+    padding: 28px 0 20px;
+  }
+  .lead {
+    max-width: 38em;
+  }
+  .sections {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  .sections p {
+    margin: 6px 0 0;
+    font-size: 15px;
+  }
+</style>

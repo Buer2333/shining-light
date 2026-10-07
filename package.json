@@ -1,0 +1,17 @@
+{
+  "name": "shining-light",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "build:samples": "SITE_INCLUDE_SAMPLES=1 astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@fontsource/jetbrains-mono": "5.3.0",
+    "@observablehq/plot": "0.6.17",
+    "astro": "7.3.6"
+  }
+}

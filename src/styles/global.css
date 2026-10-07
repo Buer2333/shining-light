@@ -1,0 +1,218 @@
+@font-face {
+  font-family: 'Smiley Sans';
+  src: url('../assets/fonts/SmileySans.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Tokens: brand identity §4 (克莱因光) / §5 (字) */
+:root {
+  --light: #fff7e9;
+  --light-deep: #f3e8d2;
+  --card: #ffffff;
+  --field: #2b3fe6;
+  --ink: #141a4d;
+  --ink-soft: #5c6189;
+  --marker: #ffd60a;
+  --wrong: #ff4b3a;
+  --rule: #e4d8bf;
+
+  --font-display: 'Smiley Sans', system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, 'PingFang SC', 'Noto Sans SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --gutter: 16px;
+  --max: 920px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--light);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+a {
+  color: var(--field);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
+
+h1 {
+  font-size: clamp(30px, 6vw, 46px);
+  margin: 0.4em 0 0.3em;
+}
+
+h2 {
+  font-size: clamp(22px, 4vw, 28px);
+  margin: 1.8em 0 0.5em;
+}
+
+code,
+.mono {
+  font-family: var(--font-mono);
+}
+
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* The one highlight per screen: marker band over the lower half of the text */
+.hl {
+  background: linear-gradient(transparent 58%, var(--marker) 58%, var(--marker) 92%, transparent 92%);
+  color: var(--ink);
+  padding: 0 0.1em;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+
+.muted {
+  color: var(--ink-soft);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 16px 18px;
+  box-shadow: 4px 4px 0 var(--field);
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.list a.title {
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 22px;
+}
+
+.list a.title:hover {
+  color: var(--field);
+}
+
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border: 1px solid var(--field);
+  color: var(--field);
+  border-radius: 999px;
+  padding: 1px 10px;
+  margin: 2px 4px 2px 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tag[aria-pressed='true'] {
+  background: var(--field);
+  color: var(--light);
+}
+
+.empty {
+  border: 1px dashed var(--ink-soft);
+  border-radius: 6px;
+  padding: 24px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+  background: var(--card);
+}
+
+th,
+td {
+  border: 1px solid var(--rule);
+  padding: 6px 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+th:first-child,
+td:first-child {
+  text-align: left;
+}
+
+th {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--ink-soft);
+  background: var(--light-deep);
+}
+
+td.missing {
+  color: var(--ink-soft);
+}
+
+input[type='search'],
+select {
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--ink-soft);
+  border-radius: 6px;
+  padding: 6px 10px;
+  max-width: 100%;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+.prose blockquote {
+  margin: 1em 0;
+  padding-left: 14px;
+  border-left: 3px solid var(--field);
+  color: var(--ink-soft);
+}

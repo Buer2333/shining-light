@@ -1,0 +1,119 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { fmtDate, url } from '../../lib/site';
+
+const entries = (await getCollection('brandlab')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+const tags = [...new Set(entries.flatMap((e) => e.data.tags))].sort((a, b) =>
+  a.localeCompare(b, 'zh-CN'),
+);
+---
+
+<Base title="品牌拆解库" description="一个品牌一页：它的广告创意里真正起作用的是哪一处。">
+  <h1>品牌拆解库</h1>
+  <p class="muted">一个品牌一页。只写它的广告创意里真正起作用的那一处，和我从里面学到的东西。</p>
+
+  {
+    entries.length === 0 ? (
+      <p class="empty">整理中。</p>
+    ) : (
+      <div data-brandlab>
+        <div class="filters">
+          <input type="search" placeholder="搜品牌、标题、摘要" aria-label="搜索" data-q />
+          <div class="tags" role="group" aria-label="标签筛选">
+            {tags.map((t) => (
+              <button type="button" class="tag" aria-pressed="false" data-tag={t}>
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+        <ul class="list">
+          {entries.map((e) => (
+            <li
+              class="card"
+              data-item
+              data-tags={JSON.stringify(e.data.tags)}
+              data-text={[e.data.title, e.data.brand, e.data.category, e.data.summary, ...e.data.tags]
+                .join(' ')
+                .toLowerCase()}
+            >
+              <p class="meta">
+                {e.data.brand} · {e.data.category} · {fmtDate(e.data.date)}
+                {e.data.sample && ' · 示例数据'}
+              </p>
+              <a class="title" href={url(`brandlab/${e.id}/`)}>
+                {e.data.title}
+              </a>
+              <p>{e.data.summary}</p>
+              <p>
+                {e.data.tags.map((t) => (
+                  <span class="tag">{t}</span>
+                ))}
+              </p>
+            </li>
+          ))}
+        </ul>
+        <p class="empty" data-none hidden>
+          没有匹配的条目。
+        </p>
+      </div>
+    )
+  }
+</Base>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-brandlab]');
+  if (root) {
+    const q = root.querySelector<HTMLInputElement>('[data-q]')!;
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('button[data-tag]')];
+    const items = [...root.querySelectorAll<HTMLElement>('[data-item]')];
+    const none = root.querySelector<HTMLElement>('[data-none]')!;
+    const active = new Set<string>();
+
+    const apply = () => {
+      const terms = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      let shown = 0;
+      for (const el of items) {
+        const tags: string[] = JSON.parse(el.dataset.tags || '[]');
+        const text = el.dataset.text || '';
+        const ok =
+          [...active].every((t) => tags.includes(t)) && terms.every((t) => text.includes(t));
+        el.hidden = !ok;
+        if (ok) shown++;
+      }
+      none.hidden = shown > 0;
+    };
+
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        const t = b.dataset.tag!;
+        if (active.has(t)) active.delete(t);
+        else active.add(t);
+        b.setAttribute('aria-pressed', String(active.has(t)));
+        apply();
+      }),
+    );
+    q.addEventListener('input', apply);
+  }
+</script>
+
+<style>
+  .filters {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  input[type='search'] {
+    width: 100%;
+    max-width: 420px;
+  }
+  .list p {
+    margin: 6px 0 0;
+  }
+  li span.tag {
+    cursor: default;
+  }
+</style>

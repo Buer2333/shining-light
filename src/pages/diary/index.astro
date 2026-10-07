@@ -1,0 +1,71 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import DiaryChart, { type Row } from '../../components/DiaryChart.astro';
+import { PLATFORM_LABEL, STATUS_LABEL, firstPublished, fmtDate, url } from '../../lib/site';
+
+const entries = (await getCollection('diary'))
+  .filter((e) => e.data.public)
+  .sort((a, b) => b.data.no.localeCompare(a.data.no, 'zh-CN', { numeric: true }));
+
+const rows: Row[] = entries.flatMap((e) =>
+  e.data.samples.map((s) => ({
+    series: `${e.data.no} · ${PLATFORM_LABEL[s.platform]}`,
+    no: e.data.no,
+    title: e.data.title,
+    pillar: e.data.pillar,
+    platform: s.platform,
+    hours: s.hours_since_publish,
+    bucket: s.bucket,
+    views: s.views,
+    likes: s.likes,
+    collects: s.collects,
+    comments: s.comments,
+    shares: s.shares,
+    completion_rate: s.completion_rate,
+    followers_gained: s.followers_gained,
+  })),
+);
+---
+
+<Base title="发布日记" description="Shining 每期发布后的数据记录，按实测小时数采样。">
+  <h1>发布日记</h1>
+  <p class="muted">
+    每期发布后按「发布后多少小时」采样。档位按窗口归属：24h ±6h、72h ±12h、7d ±24h，标签写成「≈24h（实测 26.5h）」；
+    不在窗口内的只当普通时间点。没采到就是「未采」，不插值、不补 0。
+  </p>
+
+  <h2>总览</h2>
+  <DiaryChart rows={rows} />
+
+  <h2>每一期</h2>
+  {
+    entries.length === 0 ? (
+      <p class="empty">第一期整理中。</p>
+    ) : (
+      <ul class="list">
+        {entries.map((e) => {
+          const pub = firstPublished(e.data.platforms);
+          return (
+            <li class="card">
+              <p class="meta">
+                {e.data.no} · {e.data.pillar} · {STATUS_LABEL[e.data.status]}
+                {pub && ` · ${fmtDate(pub)}`}
+                {e.data.sample && ' · 示例数据'}
+              </p>
+              <a class="title" href={url(`diary/${e.id}/`)}>
+                {e.data.title}
+              </a>
+              <p class="meta">
+                {Object.keys(e.data.platforms)
+                  .map((p) => PLATFORM_LABEL[p])
+                  .join(' / ')}{' '}
+                · 采样 {e.data.samples.length} 次
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+    )
+  }
+</Base>

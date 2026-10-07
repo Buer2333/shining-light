@@ -1,0 +1,134 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import {
+  BUCKETS,
+  BUCKET_LABEL,
+  METRICS,
+  MISSING,
+  PLATFORM_LABEL,
+  SOURCE_LABEL,
+  STATUS_LABEL,
+  fmtDate,
+  fmtMetric,
+  sampleLabel,
+  url,
+} from '../../lib/site';
+
+export async function getStaticPaths() {
+  const entries = (await getCollection('diary')).filter((e) => e.data.public);
+  return entries.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+
+const platforms = (['xhs', 'douyin'] as const).filter((p) => d.platforms[p]);
+const samplesFor = (p: string) => d.samples.filter((s) => s.platform === p);
+// One row per bucket: the sample the exporter assigned to that bucket, or 「未采」.
+const bucketRow = (p: string, b: string) => samplesFor(p).find((s) => s.bucket === b) ?? null;
+const points = (p: string) =>
+  samplesFor(p)
+    .filter((s) => s.bucket === 'point')
+    .sort((a, b) => a.hours_since_publish - b.hours_since_publish);
+---
+
+<Base title={d.title}>
+  <p class="meta">
+    <a href={url('diary/')}>← 发布日记</a> · {d.no} · {d.pillar} · {STATUS_LABEL[d.status]}
+    {d.sample && ' · 示例数据'}
+  </p>
+  <h1>{d.title}</h1>
+
+  {
+    platforms.map((p) => {
+      const pf = d.platforms[p]!;
+      return (
+        <section>
+          <h2>{PLATFORM_LABEL[p]}</h2>
+          <p class="meta">
+            {pf.title && pf.title !== d.title && <>标题：{pf.title} · </>}
+            {pf.published_at ? <>发布 {fmtDate(pf.published_at)}</> : '未发布'}
+            {pf.url && (
+              <>
+                {' '}
+                · <a href={pf.url} rel="noopener noreferrer">平台原帖</a>
+              </>
+            )}
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>时点</th>
+                  {METRICS.map(([, label]) => (
+                    <th>{label}</th>
+                  ))}
+                  <th>来源</th>
+                </tr>
+              </thead>
+              <tbody>
+                {BUCKETS.map((b) => {
+                  const s = bucketRow(p, b);
+                  return s ? (
+                    <tr>
+                      <td>{sampleLabel(b, s.hours_since_publish)}</td>
+                      {METRICS.map(([k]) => (
+                        <td class={s[k] === null ? 'missing' : undefined}>{fmtMetric(k, s[k])}</td>
+                      ))}
+                      <td>{SOURCE_LABEL[s.source]}</td>
+                    </tr>
+                  ) : (
+                    <tr>
+                      <td>{BUCKET_LABEL[b]}</td>
+                      {METRICS.map(() => (
+                        <td class="missing">{MISSING}</td>
+                      ))}
+                      <td class="missing">—</td>
+                    </tr>
+                  );
+                })}
+                {points(p).map((s) => (
+                  <tr>
+                    <td>{sampleLabel('point', s.hours_since_publish)}</td>
+                    {METRICS.map(([k]) => (
+                      <td class={s[k] === null ? 'missing' : undefined}>{fmtMetric(k, s[k])}</td>
+                    ))}
+                    <td>{SOURCE_LABEL[s.source]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      );
+    })
+  }
+
+  {
+    d.retro && (
+      <section>
+        <h2>复盘</h2>
+        <p>{d.retro}</p>
+      </section>
+    )
+  }
+
+  {
+    d.comments_notes.length > 0 && (
+      <section>
+        <h2>评论区</h2>
+        <ul>
+          {d.comments_notes.map((c) => (
+            <li>{c}</li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section class="prose">
+    <Content />
+  </section>
+</Base>
