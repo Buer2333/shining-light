@@ -465,6 +465,10 @@ def _display(rel: str, masked: bool) -> str:
     return "<masked:%s>" % hashlib.sha256(rel.encode("utf-8")).hexdigest()[:8]
 
 
+SELF_EXEMPT_RULES = {"private-path", "file-unknown-type"}
+_SELF_SHA = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+
+
 def scan(roots, cfg=None, terms=None, out=print) -> int:
     """返回 0=PASS，1=FAIL。任何异常由调用方转成 FAIL。"""
     cfg = cfg if cfg is not None else load_config()
@@ -481,6 +485,14 @@ def scan(roots, cfg=None, terms=None, out=print) -> int:
                 results[cid] = fn(path, rel, data, cfg, terms)
             except Exception as e:  # noqa: BLE001
                 results[cid] = ("FAIL", [(0, "checker-error:%s:%s" % (cid, type(e).__name__))])
+        # 闸脚本自身（与正在运行的这份逐字节相同）会命中自己的路径规则和 .py 类型：只豁免这两条规则，
+        # 品牌 / PII / 数字等仍照常检查；内容被改过一个字节就不再算「自身」（2026-10-07 用户选方案 1）
+        if path.name == Path(__file__).name and hashlib.sha256(data).hexdigest() == _SELF_SHA:
+            for cid, res in list(results.items()):
+                if isinstance(res, tuple) and len(res) == 2 and res[0] != PASS:
+                    rest = [f for f in res[1] if f[1] not in SELF_EXEMPT_RULES]
+                    if res[1] and not rest:
+                        results[cid] = (PASS, [])
         masked = results.get("filename", ("FAIL", []))[0] != PASS
         disp = _display(rel, masked)
         for cid in REQUIRED_CHECKERS:
