@@ -3,15 +3,48 @@
   "slug": "supreme-box-logo",
   "title": "Supreme的红框，原来是借来的",
   "pillar": "品牌拆解",
-  "status": "scheduled",
+  "status": "published",
   "date": "2026-10-07",
   "platforms": {
     "xhs": {
-      "title": "Supreme的红框，原来是借来的"
+      "title": "Supreme的红框，原来是借来的",
+      "url": "https://www.xiaohongshu.com/explore/6ac6255d000000001801bb3e",
+      "published_at": "2026-10-07T18:56:29+08:00"
     },
     "douyin": {
-      "title": "Supreme的红框，原来是借来的"
+      "title": "Supreme的红框，原来是借来的",
+      "url": "https://www.douyin.com/video/7693879798901298545",
+      "published_at": "2026-10-07T19:03:06+08:00"
     }
   },
-  "samples": []
+  "samples": [
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-10-07T23:33:48+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 4.6,
+      "bucket": "point",
+      "label": "4.6h",
+      "metrics": {
+        "likes": 0,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-10-07T23:36:52+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 4.6,
+      "bucket": "point",
+      "label": "4.6h",
+      "metrics": {
+        "likes": 9,
+        "collects": 0,
+        "comments": 3,
+        "shares": 1
+      }
+    }
+  ]
 }
