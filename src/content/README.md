@@ -24,7 +24,7 @@
 no: NO.01                       # string，期号
 slug: example                   # string
 title: 标题                      # string
-pillar: 品牌拆解                  # 品牌拆解 | 真实翻车 | 名词卡 | 业务落地 | 组织观察 | intro
+pillar: 品牌拆解                  # 品牌拆解 | 真实翻车 | 名词卡 | 业务落地 | 组织观察 | 炫技卡点 | intro
 status: published               # scheduled | published | withdrawn
 platforms:                      # 两个键都可选
   xhs:    { title: "", url: "https://…" | "", published_at: "2026-10-07T21:00:00+08:00" | "" }

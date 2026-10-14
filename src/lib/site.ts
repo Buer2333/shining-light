@@ -1,4 +1,4 @@
-export const PILLARS = ['品牌拆解', '真实翻车', '名词卡', '业务落地', '组织观察', 'intro'] as const;
+export const PILLARS = ['品牌拆解', '真实翻车', '名词卡', '业务落地', '组织观察', '炫技卡点', 'intro'] as const;
 
 export const PLATFORM_LABEL: Record<string, string> = { xhs: '小红书', douyin: '抖音' };
 export const SOURCE_LABEL: Record<string, string> = { tikhub: '接口', screenshot: '截图录入' };
