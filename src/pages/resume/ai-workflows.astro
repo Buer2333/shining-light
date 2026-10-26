@@ -1,0 +1,481 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// AI 工作流作品集（面试展示用的单独路由，不进导航）。
+// 底本：2026-10-16 AI 版详细简历 + 2026-10-18 数字审计口径；2026-10 近期工作补在最后一块。
+// 公开站发布闸会拦品牌词、真名和业务金额，所以金额一律换成比例或计数。
+
+type Item = {
+  title: string;
+  problem: string;
+  flow: string[];
+  result: string[];
+  talk: string;
+};
+
+type Section = { id: string; kicker: string; title: string; lede: string; items: Item[] };
+
+const sections: Section[] = [
+  {
+    id: 'sec-harness',
+    kicker: 'Agent 工程底座',
+    title: '让 AI 按规矩干活：Claude Code harness',
+    lede: '所有业务工作流都跑在同一套自建的 agent 底座上。核心思路是分层、职责单一、按需加载，能机器强制的就不靠提示词。',
+    items: [
+      {
+        title: '分层架构',
+        problem: '规则、流程、状态和外部数据混在一份提示词里，越写越长，模型越来越不听。',
+        flow: ['规则与行为契约', 'skill 流程', 'hook 强制', 'agent 委派', '任务状态库', 'MCP 实时数据'],
+        result: [
+          '102 个 skill，靠描述里的触发词和反向锚点路由，正文用到时才加载',
+          '60 多个 hook 脚本：拦截和校验类机器强制，提醒类只给建议',
+          '7 个 subagent，审视类工具白名单只读，防递归',
+          '跨会话任务状态库累计 332 个任务，换会话、换模型都能接上',
+        ],
+        talk: '可以聊：一条新约束该落在哪一层（权限 → 沙箱 → hook → 文档，取第一个可行层）。',
+      },
+      {
+        title: 'SPEC-GATE：先对齐验收标准，再动手',
+        problem: 'agent 最常见的失败是做了一件用户没要的事，然后自己宣布完成。',
+        flow: ['写需求对齐块', '用户点头', '执行', '逐条验收自评', 'Stop hook 校验'],
+        result: [
+          '2026-09-10 起所有会话和子任务机器强制',
+          '没写验收标准的 subagent 派发会被直接拦下',
+          '自评只报不合格项和需要用户决定的事，不在对话里堆过程',
+        ],
+        talk: '可以聊：怎么把「对齐」从态度变成一个会拦人的文件检查。',
+      },
+      {
+        title: '/pilot 无人值守模式',
+        problem: '夜跑复盘发现：写进提示词的纪律，实际只遵守了三分之一；真正救场的全是可执行的检查文件。',
+        flow: ['验收标准编译成检查器', '每个闸门跑阴性对照', '三个硬停止', '晨间一页报告'],
+        result: [
+          '检查器的退出码就是结论，不靠模型读输出自己下判断',
+          '三个硬停止：达标停、同一环节连续三次失败停、到时间窗口停',
+          '需要人眼判断的项只进待看清单，不能当循环的终止条件',
+          '这个页面本身就是用 pilot 模式无人值守做完并上线的',
+        ],
+        talk: '可以聊：为什么闸门自己出 bug 的概率不低于产物，以及阴性对照怎么抓到它。',
+      },
+      {
+        title: 'plan 审查与双执行端',
+        problem: '复杂改动的计划在动手前没人审，问题到实施期才暴露。',
+        flow: ['进入 plan mode', '只读审查', '不可执行就打回', '高频问题沉淀成清单'],
+        result: [
+          '59 个 plan 在动手前过审，首轮查出 101 条阻塞问题',
+          '高频阻塞沉淀成 38 项写 plan 前必查清单',
+          'Codex 和 Claude Code 并行执行，动手前先对远端主干和任务状态取证，同一对象同一时间只由一方改',
+        ],
+        talk: '可以聊：多 agent 协作时怎么避免两边各按自己的旧记录改同一个东西。',
+      },
+    ],
+  },
+  {
+    id: 'sec-creative',
+    kicker: '业务 · 创意生产',
+    title: 'AI 广告创意生产链路',
+    lede: '跨境电商品牌（TikTok 美区）。把灵感、脚本、AI 生成、审核、投放、效果回收接成一条可追溯的链。',
+    items: [
+      {
+        title: '灵感到脚本生产台',
+        problem: '组长和剪辑靠群聊传片，打回意见不留痕，日报归因只能靠标题反推编号。',
+        flow: ['视频灵感库', '编导例会评审', '一键转脚本', '派活', '交片审核', '按编号回填出单'],
+        result: [
+          '编导评审过的灵感在评审台一键转成脚本，已有 43 个进入生产',
+          'AI 每日灵感作为补充输入：每天从 19 个来源采集，按评分标准选前 5 条推群',
+          '5 个组约 30 人，派活到审片统一成一条状态流转，每次状态变化自动通知下一环节的人',
+          '102 个脚本按编号追溯到 6,370 单（平台归因，含迁入的存量脚本）',
+        ],
+        talk: '可以聊：把派活到出单抽象成状态机（待剪辑 → 待审 → 打回 / 合格），打回必须写意见、两签才通过。',
+      },
+      {
+        title: 'AI 进入主产线与对标拆解',
+        problem: '平台打压同质化素材后，一条实拍脚本裂变几十遍的打法效果明显下滑。',
+        flow: ['专岗验证', '独立账户测试', '推到三条产品线', '统一拆解码本', '找新内容路线'],
+        result: [
+          '口播约 80% 由数字人替代外籍模特（本人估算）',
+          'AI 逐条拆解头部竞品 355 条素材（前 6 秒与全片同一套码本），定位出团队切到 AI 后出单集中在单一内容框架',
+          '推动团队重心从剪辑转向编导：筛创意、写脚本和配套提示词，建提示词模板库',
+        ],
+        talk: '可以聊：先迭代出单脚本、再裂变，为什么比直接换人换场景裂变更不容易同质化。',
+      },
+    ],
+  },
+  {
+    id: 'sec-video',
+    kicker: '产品 · 团队在用',
+    title: 'AI 视频与语音产品',
+    lede: '从团队需求出发定方案和验收标准，vibe coding 交付，团队日常在用。',
+    items: [
+      {
+        title: '视频生成工作台',
+        problem: '云端视频模型失败率高，失败大多是平台内容过滤，单条成本也高。',
+        flow: ['云端模型', '失败归因', '接入自部署模型通道', '提示词改写层', '检查不过回落原提示词'],
+        result: [
+          '35 位使用者（含本人）累计生成 2,847 次',
+          '成功率从 2026-08 前 90 天约 47% 升到近 30 天约 76%，主因是接入自部署通道',
+          '同类镜头单条成本：自部署按 GPU 时租折算，约为云 API 的 1/18',
+        ],
+        talk: '可以聊：先做失败归因（2026-08 近 30 天云端失败的 89% 是内容过滤），再决定换通道，而不是先调提示词。',
+      },
+      {
+        title: '视频生成服务架构',
+        problem: '每接一个新模型，调用方就要跟着改。',
+        flow: ['接口层', '任务队列', '单卡 worker', '引擎适配层'],
+        result: [
+          '3 套视频模型实现共用一个接口，换模型不改调用方',
+          '模拟引擎压测 100 条任务、50 路并发，零丢单',
+        ],
+        talk: '可以聊：引擎可插拔的边界划在哪，以及为什么 worker 按单卡切。',
+      },
+      {
+        title: '配音克隆与飞书机器人',
+        problem: '付费配音音色贵且慢；高频手工动作散落在群聊里。',
+        flow: ['原接口不变', '调用方只切地址', '组员上传参考音频自助克隆', '群消息事件触发自动处理'],
+        result: [
+          '28 个付费配音音色迁到自部署克隆，150 字符西语配音从约 38 秒降到约 10 秒',
+          '飞书机器人：简历解析自动入库 347 份，视频转写近期每天约 30 次',
+          '封户和余额异常每小时内推到负责人',
+        ],
+        talk: '可以聊：迁移时为什么坚持接口不变，以及哪些手工动作值得改成事件触发。',
+      },
+    ],
+  },
+  {
+    id: 'sec-data',
+    kicker: '数据 · AI 直接取数',
+    title: '广告与店铺数据接成 MCP',
+    lede: '两年多在 TikTok 投放一线。把广告户和店铺数据接成 AI 能直接调用的接口，再用 AI 对账抓口径问题。',
+    items: [
+      {
+        title: '广告与店铺 MCP',
+        problem: '取数靠导表，上千个授权账户首次全量加载要很久。',
+        flow: ['开源广告 MCP 扩建', '店铺 MCP 从零自建', '批量播种账户缓存', 'AI 按需取数'],
+        result: [
+          '广告 MCP 工具从 6 个扩到 24 个；店铺 MCP 自建 25 个工具',
+          '1,027 个授权账户的首次加载，从估算约 2 天改为一次批量完成',
+          '独立站 Meta 投放全部走 API：建投放、建规则、读数据',
+        ],
+        talk: '可以聊：批量扫描别打生产 token，以及权限受限的接口会把无权对象静默摘掉、返回空列表。',
+      },
+      {
+        title: 'AI 对账定位口径问题',
+        problem: '报表数字看起来正常，其实口径错了，决策跟着错。',
+        flow: ['对照平台后台逐层复验', '找根因', '修口径', '沉淀排查步骤'],
+        result: [
+          '独立站某日投产比虚高 44%（1.21 实为 0.84，新户消耗漏统计）',
+          '订阅折扣让投产比虚高约 10%；某店某日营收虚高 2.4 倍（未付款单被计入）',
+          '沉淀 20 套异常排查步骤',
+        ],
+        talk: '可以聊：造一个指标时为什么要先配一个空对照，证明校验器自己会失败。',
+      },
+    ],
+  },
+  {
+    id: 'sec-ip',
+    kicker: '个人 · 日更 IP',
+    title: 'Shining · HIGHLIGHT：AI 写代码出动画',
+    lede: '个人 IP，抖音和小红书日更动效短视频。专门的内容会话负责选题、规划和生成，我只做 review 和人工发布。',
+    items: [
+      {
+        title: '日更视频管线',
+        problem: '日更要稳定出片，又不能每期都靠人肉检查穿帮。',
+        flow: ['选题', '方向确认', '脚本（配音 + 分镜）', '镜头剧本确认', 'Remotion 渲染', '自动检查', '发布包', '数据回收', '周复盘'],
+        result: [
+          '2026-10 起已发布 15 期，日更进行中',
+          '30 个自动检查脚本：镜头剧本、字幕与配音对读、封面、响度、平台用语、脱敏、落位等',
+          '成片只能由出片脚本写入，写之前先过落位检查和镜头剧本门',
+        ],
+        talk: '可以聊：把「这期好不好看」里能机器判的部分拆出来，剩下的才交给人。',
+      },
+      {
+        title: '开源骨骼动画库 shining-rig',
+        problem: '卡通形象要能做动作，各期重复写动效。',
+        flow: ['角色配置', '切件', '动作轨道', '打 tag 发布', '只读副本同步', '逐像素对拍'],
+        result: [
+          '2D 骨骼动画库，公开仓库，MIT 协议',
+          '版本只增不移，已发布期逐像素不变；推送前过公开面扫描',
+        ],
+        talk: '可以聊：库和业务工程怎么解耦，同一个 sha 怎么保证线上旧期不被新版本改掉。',
+      },
+      {
+        title: '这个网站与发布闸',
+        problem: '公开站和私有工作区共用素材，一不小心就会把真名、品牌、业务数字发出去。',
+        flow: ['私有仓白名单导出', '构建', '发布闸（本地）', 'CI 复检同一份闸', '部署'],
+        result: [
+          '发布闸 fail-closed：检查器缺失、抛异常、配置缺失一律不放行',
+          '拦品牌词、真名、联系方式、凭证、私有路径；作品和简历栏目额外拦业务金额',
+          '日志只打印文件、行号和规则编号，不打印命中原文',
+        ],
+        talk: '可以聊：为什么这页里所有金额都换成了比例。',
+      },
+    ],
+  },
+  {
+    id: 'sec-recent',
+    kicker: '近期 · 2026-10',
+    title: '最近在做的',
+    lede: '最近两周补上的几条工作流。',
+    items: [
+      {
+        title: '业务尽调 agent 化',
+        problem: '接手一个新品类前，要在几天内判断「一年能做到多大」，而对方只能给口述数据。',
+        flow: ['并行 subagent 取数', '搜索需求与季节性', '同行自然流量', 'TikTok 类目近似销量榜', 'B 端需求与工厂报价', '带来源标签的增长测算'],
+        result: [
+          '144 个搜索词的 12 个月月度需求、50 家店的近似销量榜、同行站点流量对标',
+          '每个数字带来源标签，推算和口述分开标',
+          '结论给成区间和季度关卡，到点按实际数据重新预测，而不是给一个拍脑袋的目标',
+          '数据接口调用成本不到一美元',
+        ],
+        talk: '可以聊：累计销量除以月数会把月销高估约 3 倍，所以改用评论换算。',
+      },
+      {
+        title: '品牌官号运营与 SEO 管线',
+        problem: '社媒和内容站要多人协作、要审，审核记录又不能只活在群聊里。',
+        flow: ['内容日历', '方向对齐审核', '素材生成', '终审', '发布与回填', '周复盘'],
+        result: [
+          '品牌官号运营 skill 按品牌参数化，两道审核门，周预案审阅页',
+          'SEO 文章带宣称与证据对照表，批准后的内容 hash 对不上就不发布',
+        ],
+        talk: '可以聊：批准 hash 门怎么防止「审的是一版、发的是另一版」。',
+      },
+      {
+        title: 'Claude Code 插件与存档机制',
+        problem: '多任务并行时，任务状态和对话记录对不上，换会话就丢上下文。',
+        flow: ['沉淀分流', '任务存档', '自动预填会话名', '新会话按任务号加载'],
+        result: [
+          '任务状态和对话记录按会话短名对上，新会话一条命令恢复',
+          '每轮结束前先判断有没有「下次还会用到」的结论，有就先分流沉淀，再存状态',
+        ],
+        talk: '可以聊：为什么沉淀和存档是两个命令，而不是合成一个。',
+      },
+    ],
+  },
+];
+
+const counts = [
+  ['102', '个 skill'],
+  ['2,847', '次团队视频生成'],
+  ['6,370', '单可追溯到脚本'],
+  ['15', '期日更动效视频'],
+];
+---
+
+<Base title="AI 工作流作品集" description="跨境电商团队的 AI 创意生产、投放数据与 agent 工程，以及个人日更 IP 管线。">
+  <article class="aiwf" id="pilot-marker-aiwf">
+    <header class="hero">
+      <p class="eyebrow">AI 工作流作品集 · 2026-10</p>
+      <h1>把团队的活，接成 AI 能执行、能验收的工作流</h1>
+      <p class="lede">
+        跨境电商品牌增长负责人，2026.03 起主导团队 AI 产品；之前做了 7 年软件研发。下面每一块都是在用的系统，按「解决什么问题 → 工作流 → 结果 → 可以展开聊什么」来写。
+      </p>
+      <ul class="counts">
+        {counts.map(([n, l]) => (
+          <li><strong>{n}</strong><span>{l}</span></li>
+        ))}
+      </ul>
+      <nav class="toc" aria-label="本页目录">
+        {sections.map((s) => <a href={`#${s.id}`}>{s.kicker}</a>)}
+      </nav>
+    </header>
+
+    {
+      sections.map((s) => (
+        <section id={s.id} class="block">
+          <p class="kicker">{s.kicker}</p>
+          <h2>{s.title}</h2>
+          <p class="block-lede">{s.lede}</p>
+          <div class="items">
+            {s.items.map((it) => (
+              <div class="item">
+                <h3>{it.title}</h3>
+                <p class="problem"><span class="tag">问题</span>{it.problem}</p>
+                <ol class="flow" aria-label="工作流">
+                  {it.flow.map((f) => <li>{f}</li>)}
+                </ol>
+                <ul class="result">
+                  {it.result.map((r) => <li>{r}</li>)}
+                </ul>
+                <p class="talk">{it.talk}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+
+    <p class="note">
+      数字口径：计数来自系统记录或本人统计（已注明）；出单为平台归因。公开页不放金额，成本只给比例。
+    </p>
+  </article>
+</Base>
+
+<style>
+  .aiwf {
+    padding-block: 8px 48px;
+  }
+  .hero {
+    padding-block: 24px 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .eyebrow,
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(30px, 6vw, 46px);
+    line-height: 1.2;
+    margin: 0 0 16px;
+    text-wrap: balance;
+  }
+  .lede {
+    max-width: 40em;
+    color: var(--ink);
+    margin: 0 0 24px;
+  }
+  .counts {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .counts li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 14px;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+  }
+  .counts strong {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 1.1;
+    color: var(--field);
+    font-variant-numeric: tabular-nums;
+  }
+  .counts span {
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    padding-block: 4px 16px;
+    font-size: 15px;
+  }
+  .block {
+    padding-block: 40px 8px;
+    scroll-margin-top: 16px;
+  }
+  .block h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(24px, 4.4vw, 32px);
+    line-height: 1.25;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+  .block h2::after {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 6px;
+    margin-top: 8px;
+    background: var(--marker);
+  }
+  .block-lede {
+    max-width: 40em;
+    color: var(--ink-soft);
+    margin: 0 0 20px;
+  }
+  .items {
+    display: grid;
+    gap: 16px;
+  }
+  .item {
+    min-width: 0;
+    padding: 20px;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+  }
+  .item h3 {
+    font-size: 19px;
+    margin: 0 0 10px;
+  }
+  .problem {
+    margin: 0 0 14px;
+  }
+  .tag {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 0 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 20px;
+    color: var(--card);
+    background: var(--ink);
+    border-radius: 3px;
+    vertical-align: 2px;
+  }
+  .flow {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 0;
+    font-size: 14px;
+  }
+  .flow li {
+    display: flex;
+    align-items: center;
+  }
+  .flow li:not(:last-child)::after {
+    content: '→';
+    margin: 0 8px;
+    color: var(--ink-soft);
+  }
+  .flow li {
+    color: var(--field);
+  }
+  .flow li > * {
+    min-width: 0;
+  }
+  .result {
+    margin: 0 0 14px;
+    padding-left: 1.2em;
+  }
+  .result li + li {
+    margin-top: 4px;
+  }
+  .talk {
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 15px;
+    background: var(--light-deep);
+    border-radius: 4px;
+  }
+  .note {
+    margin-top: 40px;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  @media (max-width: 480px) {
+    .item {
+      padding: 16px;
+    }
+  }
+</style>
