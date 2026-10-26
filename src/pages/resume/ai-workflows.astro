@@ -1,19 +1,44 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { url } from '../../lib/site';
 
 // AI 工作流作品集（面试展示用的单独路由，不进导航）。
 // 底本：2026-10-16 AI 版详细简历 + 2026-10-18 数字审计口径；2026-10 近期工作补在最后一块。
-// 公开站发布闸会拦品牌词、真名和业务金额，所以金额一律换成比例或计数。
+// 公开站发布闸会拦品牌词、真名和业务金额，所以金额一律换成比例或计数；团队流程里的人一律写角色。
+
+type Step = { t: string; who?: string; auto?: string; back?: string };
+type Diagram =
+  | { kind: 'steps'; steps: Step[] }
+  | { kind: 'layers'; caption: string; layers: [string, string][] }
+  | { kind: 'fanout'; source: string; branches: string[]; sink: string }
+  | { kind: 'states' }
+  | { kind: 'gallery' };
 
 type Item = {
   title: string;
   problem: string;
-  flow: string[];
+  diagram?: Diagram;
+  flow?: string[];
   result: string[];
   talk: string;
 };
 
 type Section = { id: string; kicker: string; title: string; lede: string; items: Item[] };
+
+const GALLERY = [
+  ['01', '一张表，从脚本走到出单'],
+  ['02', '创意在自己组的视图里新建一行'],
+  ['03', '组长填「剪辑分配」，剪辑马上收到飞书通知'],
+  ['04', '剪辑每天 10:00 看待办卡，被打回的排最前'],
+  ['05', '传成片，自动变「等待审核」并提醒组长'],
+  ['06', '创意审、组长审都通过才算合格'],
+  ['07', '任一人选「需修改」并写意见，立刻打回'],
+  ['08', '改写或重剪建「子记录」，编号自动变成原编号-2'],
+  ['09', '发片标题带完整编号，编号是出单归因的钥匙'],
+  ['10', '系统每天按编号把出单和投放状态写回这一行'],
+  ['11', '看板按「排期 = 今天」统计，巡检每小时报警'],
+  ['12', '每个人只管自己那一步'],
+] as const;
 
 const sections: Section[] = [
   {
@@ -25,19 +50,39 @@ const sections: Section[] = [
       {
         title: '分层架构',
         problem: '规则、流程、状态和外部数据混在一份提示词里，越写越长，模型越来越不听。',
-        flow: ['规则与行为契约', 'skill 流程', 'hook 强制', 'agent 委派', '任务状态库', 'MCP 实时数据'],
+        diagram: {
+          kind: 'layers',
+          caption: '一条新约束从上往下找第一个能落的层：能被机器挡住的，不写进文档',
+          layers: [
+            ['权限 / 沙箱', '直接禁止的操作，模型想做也做不了'],
+            ['hook', '生命周期强制：拦截、校验、提醒，60 多个脚本'],
+            ['skill', '102 个流程包，按触发词和反向锚点路由，用到才加载'],
+            ['subagent', '7 个委派角色，审视类只读，防递归'],
+            ['memory', '行为契约：用户纠正过的做法和原因'],
+            ['任务状态库', '跨会话任务状态，累计 332 个任务'],
+            ['MCP', '广告、店铺、飞书等实时业务数据'],
+          ],
+        },
         result: [
-          '102 个 skill，靠描述里的触发词和反向锚点路由，正文用到时才加载',
-          '60 多个 hook 脚本：拦截和校验类机器强制，提醒类只给建议',
-          '7 个 subagent，审视类工具白名单只读，防递归',
-          '跨会话任务状态库累计 332 个任务，换会话、换模型都能接上',
+          'skill 靠描述里的触发词和反向锚点路由，正文用到时才加载',
+          'hook 分两类：拦截和校验类机器强制，提醒类只给建议',
+          '换会话、换模型都能从任务状态库接上，不靠模型记忆',
         ],
-        talk: '可以聊：一条新约束该落在哪一层（权限 → 沙箱 → hook → 文档，取第一个可行层）。',
+        talk: '可以聊：为什么「写进提示词」是最后一个选项，而不是第一个。',
       },
       {
         title: 'SPEC-GATE：先对齐验收标准，再动手',
         problem: 'agent 最常见的失败是做了一件用户没要的事，然后自己宣布完成。',
-        flow: ['写需求对齐块', '用户点头', '执行', '逐条验收自评', 'Stop hook 校验'],
+        diagram: {
+          kind: 'steps',
+          steps: [
+            { t: '写需求对齐块：目标 + 验收标准 + 待确认', who: 'agent' },
+            { t: '用户点头；有歧义就只出对齐块，停下来问', who: '用户' },
+            { t: '执行', who: 'agent' },
+            { t: '逐条验收自评，对着证据打勾', who: 'agent' },
+            { t: 'Stop hook 检查自评是否存在、是否比需求新', who: 'hook', auto: '不过就弹回，同一轮最多三次', back: '没自评就回到上一步' },
+          ],
+        },
         result: [
           '2026-09-10 起所有会话和子任务机器强制',
           '没写验收标准的 subagent 派发会被直接拦下',
@@ -48,12 +93,19 @@ const sections: Section[] = [
       {
         title: '/pilot 无人值守模式',
         problem: '夜跑复盘发现：写进提示词的纪律，实际只遵守了三分之一；真正救场的全是可执行的检查文件。',
-        flow: ['验收标准编译成检查器', '每个闸门跑阴性对照', '三个硬停止', '晨间一页报告'],
+        diagram: {
+          kind: 'steps',
+          steps: [
+            { t: '验收标准编译成检查器，退出码就是结论', who: '起飞前' },
+            { t: '每个检查器喂一个已知的坏样本，必须正确失败', who: '起飞前', auto: '阴性对照：先证明闸门自己没坏' },
+            { t: '每一跳只做一件推进的事，跑检查器，追加写状态账本', who: '循环' },
+            { t: '三个硬停止：达标停 / 同一环节连续三次失败停 / 到时间窗口停', who: '循环', back: '没命中就进下一跳' },
+            { t: '一页晨间报告：达标证据、卡点根因、需要人看的项、账单', who: '收口' },
+          ],
+        },
         result: [
-          '检查器的退出码就是结论，不靠模型读输出自己下判断',
-          '三个硬停止：达标停、同一环节连续三次失败停、到时间窗口停',
           '需要人眼判断的项只进待看清单，不能当循环的终止条件',
-          '这个页面本身就是用 pilot 模式无人值守做完并上线的',
+          '这个页面本身就是用 pilot 模式做完并上线的：构建、发布闸、页面完整性、线上可访问，四个检查器全过才算完',
         ],
         talk: '可以聊：为什么闸门自己出 bug 的概率不低于产物，以及阴性对照怎么抓到它。',
       },
@@ -71,22 +123,109 @@ const sections: Section[] = [
     ],
   },
   {
+    id: 'sec-team',
+    kicker: '团队协作 · 表格 + 机器人',
+    title: '团队工作流：一张表走完，状态变化自动通知',
+    lede: '团队以运营、剪辑、设计为主，不写代码。我把每条协作链抽象成飞书多维表格里的一条状态流转，每次状态变化由机器人通知下一环节的人，每条都配了一条 1 到 1.5 分钟的操作说明视频。',
+    items: [
+      {
+        title: '脚本生产台',
+        problem: '5 个组约 30 人各用各的旧表，组长和剪辑靠群聊传片，打回意见不留痕，日报归因只能靠标题反推编号。',
+        diagram: { kind: 'states' },
+        result: [
+          '派活、交片、双人审核、打回、发片、回填统一到一张表，三种角色各看自己的视图',
+          '改写或重剪建「子记录」，编号自动变成原编号-2，内容从父记录带过来',
+          '发片标题带完整编号，系统每天按编号把出单和投放状态写回；102 个脚本追溯到 6,370 单（平台归因，含迁入的存量脚本）',
+          '看板按「排期 = 今天」统计各组进度，流程卡住有巡检每小时报警',
+        ],
+        talk: '可以聊：为什么「编号」是整条链的主键，以及打回为什么必须写意见。',
+      },
+      {
+        title: '操作说明视频：脚本生产台（分镜）',
+        problem: '新流程上线，30 人不可能一个个教；文档写得再细也没人看。',
+        diagram: { kind: 'gallery' },
+        result: [
+          '用 Remotion 写代码出片，界面是重绘的示意，人名一律用「创意小A、剪辑小B」，数字为示意',
+          '每一步一张卡：谁做、点哪里、系统自动发生什么',
+        ],
+        talk: '可以聊：为什么说明视频用代码重绘界面，而不是录屏。',
+      },
+      {
+        title: '品牌官号内容流转',
+        problem: '社媒内容要过周会、文案、设计、审核、发布五道手，以前在群里接力，漏发和返工都没人知道。',
+        diagram: {
+          kind: 'steps',
+          steps: [
+            { t: '周会过稿：选题 brief、预览图、对标素材都在同一行', who: '周会' },
+            { t: '写文案和压字文案，勾「文案定稿」', who: '文案', auto: '执行同学收到开工通知' },
+            { t: '出图 / 出片，交付截止 = 发布前一天中午 12 点', who: '设计' },
+            { t: '成品传到「素材」格', who: '设计', auto: '自动送审，通知审核人' },
+            { t: '成品审：任一审核人选「通过」或「需修改 + 意见」', who: '审核', back: '打回后：改设计就重传素材，只改文案直接改，都会自动重新送审' },
+            { t: '按时发布，回填帖子链接，状态改已发', who: '运营', auto: '漏发的自动出现在「逾期未发」视图' },
+          ],
+        },
+        result: [
+          '每个人只看自己的视图：文案看文案，设计看制作，审核看成品',
+          '审核意见和打回记录都留在这一行，不再散在群聊里',
+        ],
+        talk: '可以聊：打回为什么要按「改了什么」分三种路径，而不是统一重走一遍。',
+      },
+      {
+        title: '落地页对标表',
+        problem: '运营要盯竞品商品页的改价、换主图、下架，以前靠人每天手翻。',
+        diagram: {
+          kind: 'steps',
+          steps: [
+            { t: '在「链接清单」贴商品链接、选我方对应产品', who: '运营' },
+            { t: '其他信息 15 分钟内自动补齐', who: '机器人', back: '链接填错或重复：标「校验失败」并私聊运营，改好后自动重检' },
+            { t: '每天 8 点自动检查下架、改价、换主图、改详情、销量异常', who: '机器人', auto: '有异常私聊运营' },
+            { t: '每周一早上 7 点自动生成周快照', who: '机器人' },
+            { t: '周会前填「头图逻辑」和「差距与动作」', who: '运营' },
+          ],
+        },
+        result: [
+          '运营只做三件事：贴链接、看提醒、周一填逻辑',
+          '采集、校验、巡检、快照全部交给机器人',
+        ],
+        talk: '可以聊：人和机器的分工边界怎么划，哪些判断必须留给人。',
+      },
+      {
+        title: '飞书机器人',
+        problem: '高频手工动作散落在群聊里，异常靠人盯。',
+        flow: ['群里发链接或文件', '事件触发', '自动处理', '结果回群或私聊负责人'],
+        result: [
+          '简历解析自动入库 347 份，视频转写近期每天约 30 次',
+          '封户和余额异常每小时内推到负责人',
+        ],
+        talk: '可以聊：哪些手工动作值得改成事件触发，哪些不值得。',
+      },
+    ],
+  },
+  {
     id: 'sec-creative',
     kicker: '业务 · 创意生产',
     title: 'AI 广告创意生产链路',
     lede: '跨境电商品牌（TikTok 美区）。把灵感、脚本、AI 生成、审核、投放、效果回收接成一条可追溯的链。',
     items: [
       {
-        title: '灵感到脚本生产台',
-        problem: '组长和剪辑靠群聊传片，打回意见不留痕，日报归因只能靠标题反推编号。',
-        flow: ['视频灵感库', '编导例会评审', '一键转脚本', '派活', '交片审核', '按编号回填出单'],
+        title: '从灵感到出单的闭环',
+        problem: '素材生产和投放效果是断开的：哪条灵感、哪个脚本带来了订单，没人说得清。',
+        diagram: {
+          kind: 'steps',
+          steps: [
+            { t: '视频灵感库：编导录入，例会评审', who: '编导', auto: 'AI 每日灵感做补充：19 个来源，按评分选前 5 推群' },
+            { t: '评审台一键转成脚本，进生产台派活', who: '编导', auto: '已有 43 个脚本由此进入生产' },
+            { t: 'AI 生成画面与口播，剪辑成片', who: '剪辑' },
+            { t: '双人审核后发片，标题带编号', who: '组长' },
+            { t: '投放', who: '投手' },
+            { t: '按编号回填出单，出单脚本先迭代、再裂变', who: '系统', back: '出单数据回到编导，决定下一轮改哪个脚本' },
+          ],
+        },
         result: [
-          '编导评审过的灵感在评审台一键转成脚本，已有 43 个进入生产',
-          'AI 每日灵感作为补充输入：每天从 19 个来源采集，按评分标准选前 5 条推群',
-          '5 个组约 30 人，派活到审片统一成一条状态流转，每次状态变化自动通知下一环节的人',
           '102 个脚本按编号追溯到 6,370 单（平台归因，含迁入的存量脚本）',
+          '先迭代出单脚本（脚本和画面一起改），新版进次日派活，再交全组裂变',
         ],
-        talk: '可以聊：把派活到出单抽象成状态机（待剪辑 → 待审 → 打回 / 合格），打回必须写意见、两签才通过。',
+        talk: '可以聊：先迭代、再裂变，为什么比直接换人换场景裂变更不容易同质化。',
       },
       {
         title: 'AI 进入主产线与对标拆解',
@@ -97,7 +236,7 @@ const sections: Section[] = [
           'AI 逐条拆解头部竞品 355 条素材（前 6 秒与全片同一套码本），定位出团队切到 AI 后出单集中在单一内容框架',
           '推动团队重心从剪辑转向编导：筛创意、写脚本和配套提示词，建提示词模板库',
         ],
-        talk: '可以聊：先迭代出单脚本、再裂变，为什么比直接换人换场景裂变更不容易同质化。',
+        talk: '可以聊：拆解码本怎么设计，才能让 355 条素材的结论可以比较。',
       },
     ],
   },
@@ -110,18 +249,36 @@ const sections: Section[] = [
       {
         title: '视频生成工作台',
         problem: '云端视频模型失败率高，失败大多是平台内容过滤，单条成本也高。',
-        flow: ['云端模型', '失败归因', '接入自部署模型通道', '提示词改写层', '检查不过回落原提示词'],
+        diagram: {
+          kind: 'steps',
+          steps: [
+            { t: '组员提交生成任务', who: '组员' },
+            { t: '失败归因：2026-08 近 30 天云端失败的 89% 是内容过滤', who: '分析' },
+            { t: '改接不做内容过滤的自部署视频模型通道', who: '服务' },
+            { t: '提示词改写层：按模型官方写法改写，提升画面还原度', who: '服务', back: '改写结果过不了检查，就回落原提示词' },
+            { t: '出片回到工作台', who: '组员' },
+          ],
+        },
         result: [
           '35 位使用者（含本人）累计生成 2,847 次',
           '成功率从 2026-08 前 90 天约 47% 升到近 30 天约 76%，主因是接入自部署通道',
           '同类镜头单条成本：自部署按 GPU 时租折算，约为云 API 的 1/18',
         ],
-        talk: '可以聊：先做失败归因（2026-08 近 30 天云端失败的 89% 是内容过滤），再决定换通道，而不是先调提示词。',
+        talk: '可以聊：先做失败归因再换通道，而不是先调提示词。',
       },
       {
         title: '视频生成服务架构',
         problem: '每接一个新模型，调用方就要跟着改。',
-        flow: ['接口层', '任务队列', '单卡 worker', '引擎适配层'],
+        diagram: {
+          kind: 'layers',
+          caption: '调用方只认接口层，换模型只动最下面一层',
+          layers: [
+            ['接口层', '统一的提交、查询、取结果接口'],
+            ['任务队列', '排队、重试、状态'],
+            ['单卡 worker', '一张卡一个进程，互不抢显存'],
+            ['引擎适配层', '3 套视频模型实现，可插拔'],
+          ],
+        },
         result: [
           '3 套视频模型实现共用一个接口，换模型不改调用方',
           '模拟引擎压测 100 条任务、50 路并发，零丢单',
@@ -129,15 +286,11 @@ const sections: Section[] = [
         talk: '可以聊：引擎可插拔的边界划在哪，以及为什么 worker 按单卡切。',
       },
       {
-        title: '配音克隆与飞书机器人',
-        problem: '付费配音音色贵且慢；高频手工动作散落在群聊里。',
-        flow: ['原接口不变', '调用方只切地址', '组员上传参考音频自助克隆', '群消息事件触发自动处理'],
-        result: [
-          '28 个付费配音音色迁到自部署克隆，150 字符西语配音从约 38 秒降到约 10 秒',
-          '飞书机器人：简历解析自动入库 347 份，视频转写近期每天约 30 次',
-          '封户和余额异常每小时内推到负责人',
-        ],
-        talk: '可以聊：迁移时为什么坚持接口不变，以及哪些手工动作值得改成事件触发。',
+        title: '配音克隆',
+        problem: '付费配音音色贵且慢。',
+        flow: ['原接口不变', '调用方只切地址', '组员上传参考音频', '自助克隆'],
+        result: ['28 个付费配音音色迁到自部署克隆，150 字符西语配音从约 38 秒降到约 10 秒'],
+        talk: '可以聊：迁移时为什么坚持接口不变。',
       },
     ],
   },
@@ -150,9 +303,13 @@ const sections: Section[] = [
       {
         title: '广告与店铺 MCP',
         problem: '取数靠导表，上千个授权账户首次全量加载要很久。',
-        flow: ['开源广告 MCP 扩建', '店铺 MCP 从零自建', '批量播种账户缓存', 'AI 按需取数'],
+        diagram: {
+          kind: 'fanout',
+          source: 'AI 会话 / 机器人 / 报表任务',
+          branches: ['广告 MCP：24 个工具（开源基础上从 6 个扩建）', '店铺 MCP：25 个工具（从零自建）', '飞书 / 表格接口', 'Meta 投放 API'],
+          sink: '按需取数、对账、推报表，不再导表',
+        },
         result: [
-          '广告 MCP 工具从 6 个扩到 24 个；店铺 MCP 自建 25 个工具',
           '1,027 个授权账户的首次加载，从估算约 2 天改为一次批量完成',
           '独立站 Meta 投放全部走 API：建投放、建规则、读数据',
         ],
@@ -180,10 +337,19 @@ const sections: Section[] = [
       {
         title: '日更视频管线',
         problem: '日更要稳定出片，又不能每期都靠人肉检查穿帮。',
-        flow: ['选题', '方向确认', '脚本（配音 + 分镜）', '镜头剧本确认', 'Remotion 渲染', '自动检查', '发布包', '数据回收', '周复盘'],
+        diagram: {
+          kind: 'steps',
+          steps: [
+            { t: '选题与方向确认', who: '我', auto: '选题池 + 对标调研' },
+            { t: '脚本：配音稿 + 分镜 + 事实来源', who: 'AI' },
+            { t: '镜头剧本：我确认后才能出成片', who: '我' },
+            { t: 'Remotion 写代码渲染', who: 'AI' },
+            { t: '30 个自动检查脚本', who: '检查器', auto: '镜头、字幕与配音对读、封面、响度、平台用语、脱敏、落位', back: '不过就回到渲染' },
+            { t: '发布包 → 人工发布 → 数据回收 → 周复盘', who: '我' },
+          ],
+        },
         result: [
           '2026-10 起已发布 15 期，日更进行中',
-          '30 个自动检查脚本：镜头剧本、字幕与配音对读、封面、响度、平台用语、脱敏、落位等',
           '成片只能由出片脚本写入，写之前先过落位检查和镜头剧本门',
         ],
         talk: '可以聊：把「这期好不好看」里能机器判的部分拆出来，剩下的才交给人。',
@@ -192,11 +358,8 @@ const sections: Section[] = [
         title: '开源骨骼动画库 shining-rig',
         problem: '卡通形象要能做动作，各期重复写动效。',
         flow: ['角色配置', '切件', '动作轨道', '打 tag 发布', '只读副本同步', '逐像素对拍'],
-        result: [
-          '2D 骨骼动画库，公开仓库，MIT 协议',
-          '版本只增不移，已发布期逐像素不变；推送前过公开面扫描',
-        ],
-        talk: '可以聊：库和业务工程怎么解耦，同一个 sha 怎么保证线上旧期不被新版本改掉。',
+        result: ['2D 骨骼动画库，公开仓库，MIT 协议', '版本只增不移，已发布期逐像素不变；推送前过公开面扫描'],
+        talk: '可以聊：库和业务工程怎么解耦。',
       },
       {
         title: '这个网站与发布闸',
@@ -205,9 +368,8 @@ const sections: Section[] = [
         result: [
           '发布闸 fail-closed：检查器缺失、抛异常、配置缺失一律不放行',
           '拦品牌词、真名、联系方式、凭证、私有路径；作品和简历栏目额外拦业务金额',
-          '日志只打印文件、行号和规则编号，不打印命中原文',
         ],
-        talk: '可以聊：为什么这页里所有金额都换成了比例。',
+        talk: '可以聊：为什么这页里所有金额都换成了比例，团队流程里的人都写成角色。',
       },
     ],
   },
@@ -220,29 +382,30 @@ const sections: Section[] = [
       {
         title: '业务尽调 agent 化',
         problem: '接手一个新品类前，要在几天内判断「一年能做到多大」，而对方只能给口述数据。',
-        flow: ['并行 subagent 取数', '搜索需求与季节性', '同行自然流量', 'TikTok 类目近似销量榜', 'B 端需求与工厂报价', '带来源标签的增长测算'],
+        diagram: {
+          kind: 'fanout',
+          source: '问题：这个品类一年能做到多大？',
+          branches: ['搜索需求：144 个词，12 个月季节性', '同行站点自然流量对标', 'TikTok 类目近似销量榜：50 家店', 'B 端需求与工厂报价'],
+          sink: '带来源标签的增长测算 + 季度关卡',
+        },
         result: [
-          '144 个搜索词的 12 个月月度需求、50 家店的近似销量榜、同行站点流量对标',
           '每个数字带来源标签，推算和口述分开标',
-          '结论给成区间和季度关卡，到点按实际数据重新预测，而不是给一个拍脑袋的目标',
+          '结论给成区间和季度关卡，到点按实际数据重新预测',
           '数据接口调用成本不到一美元',
         ],
         talk: '可以聊：累计销量除以月数会把月销高估约 3 倍，所以改用评论换算。',
       },
       {
-        title: '品牌官号运营与 SEO 管线',
-        problem: '社媒和内容站要多人协作、要审，审核记录又不能只活在群聊里。',
-        flow: ['内容日历', '方向对齐审核', '素材生成', '终审', '发布与回填', '周复盘'],
-        result: [
-          '品牌官号运营 skill 按品牌参数化，两道审核门，周预案审阅页',
-          'SEO 文章带宣称与证据对照表，批准后的内容 hash 对不上就不发布',
-        ],
+        title: 'SEO 内容管线',
+        problem: '内容站要多人协作、要审，审的版本和发的版本不能对不上。',
+        flow: ['选词与对标', '文章源 + 宣称与证据对照表', '人工批准', '批准 hash 校验', '发布', '搜索数据回收'],
+        result: ['批准后的内容 hash 对不上就不发布'],
         talk: '可以聊：批准 hash 门怎么防止「审的是一版、发的是另一版」。',
       },
       {
-        title: 'Claude Code 插件与存档机制',
+        title: '存档机制与 Claude Code 插件',
         problem: '多任务并行时，任务状态和对话记录对不上，换会话就丢上下文。',
-        flow: ['沉淀分流', '任务存档', '自动预填会话名', '新会话按任务号加载'],
+        flow: ['沉淀分流', '任务存档', '插件自动预填会话名', '新会话按任务号加载'],
         result: [
           '任务状态和对话记录按会话短名对上，新会话一条命令恢复',
           '每轮结束前先判断有没有「下次还会用到」的结论，有就先分流沉淀，再存状态',
@@ -261,13 +424,13 @@ const counts = [
 ];
 ---
 
-<Base title="AI 工作流作品集" description="跨境电商团队的 AI 创意生产、投放数据与 agent 工程，以及个人日更 IP 管线。">
+<Base title="AI 工作流作品集" description="跨境电商团队的 AI 创意生产、团队协作流程、投放数据与 agent 工程，以及个人日更 IP 管线。">
   <article class="aiwf" id="pilot-marker-aiwf">
     <header class="hero">
       <p class="eyebrow">AI 工作流作品集 · 2026-10</p>
       <h1>把团队的活，接成 AI 能执行、能验收的工作流</h1>
       <p class="lede">
-        跨境电商品牌增长负责人，2026.03 起主导团队 AI 产品；之前做了 7 年软件研发。下面每一块都是在用的系统，按「解决什么问题 → 工作流 → 结果 → 可以展开聊什么」来写。
+        跨境电商品牌增长负责人，2026.03 起主导团队 AI 产品；之前做了 7 年软件研发。下面每一块都是在用的系统，按「解决什么问题 → 流程图 → 结果 → 可以展开聊什么」来写。
       </p>
       <ul class="counts">
         {counts.map(([n, l]) => (
@@ -290,9 +453,91 @@ const counts = [
               <div class="item">
                 <h3>{it.title}</h3>
                 <p class="problem"><span class="tag">问题</span>{it.problem}</p>
-                <ol class="flow" aria-label="工作流">
-                  {it.flow.map((f) => <li>{f}</li>)}
-                </ol>
+
+                {it.diagram?.kind === 'steps' && (
+                  <ol class="d-steps">
+                    {it.diagram.steps.map((st) => (
+                      <li>
+                        <span class="who">{st.who}</span>
+                        <div class="node">
+                          <span class="node-t">{st.t}</span>
+                          {st.auto && <span class="auto"><b>自动</b>{st.auto}</span>}
+                          {st.back && <span class="back"><b>回路</b>{st.back}</span>}
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+
+                {it.diagram?.kind === 'layers' && (
+                  <figure class="d-layers">
+                    {it.diagram.layers.map(([name, note]) => (
+                      <div class="layer"><span class="layer-n">{name}</span><span class="layer-d">{note}</span></div>
+                    ))}
+                    <figcaption>{it.diagram.caption}</figcaption>
+                  </figure>
+                )}
+
+                {it.diagram?.kind === 'fanout' && (
+                  <figure class="d-fan">
+                    <div class="fan-src">{it.diagram.source}</div>
+                    <div class="fan-mid">
+                      {it.diagram.branches.map((b) => <div class="fan-b">{b}</div>)}
+                    </div>
+                    <div class="fan-sink">{it.diagram.sink}</div>
+                  </figure>
+                )}
+
+                {it.diagram?.kind === 'states' && (
+                  <figure class="d-states">
+                    <div class="svg-scroll">
+                      <svg viewBox="0 0 780 250" role="img" aria-label="脚本状态流转：待分配到待剪辑到等待审核，两签通过为合格，任一需修改则打回待剪辑">
+                        <defs>
+                          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                            <path d="M0,0 L10,5 L0,10 z" class="ah" />
+                          </marker>
+                        </defs>
+                        <g class="st st-gray"><rect x="10" y="70" width="110" height="44" rx="22" /><text x="65" y="97">待分配</text></g>
+                        <g class="st st-blue"><rect x="200" y="70" width="110" height="44" rx="22" /><text x="255" y="97">待剪辑</text></g>
+                        <g class="st st-orange"><rect x="400" y="70" width="130" height="44" rx="22" /><text x="465" y="97">等待审核</text></g>
+                        <g class="st st-green"><rect x="640" y="20" width="110" height="44" rx="22" /><text x="695" y="47">合格</text></g>
+                        <g class="st st-red"><rect x="640" y="130" width="110" height="44" rx="22" /><text x="695" y="157">需修改</text></g>
+                        <path class="edge" d="M120,92 L196,92" marker-end="url(#ah)" />
+                        <path class="edge" d="M310,92 L396,92" marker-end="url(#ah)" />
+                        <path class="edge" d="M530,85 C580,70 600,50 636,44" marker-end="url(#ah)" />
+                        <path class="edge" d="M530,100 C580,115 600,140 636,148" marker-end="url(#ah)" />
+                        <path class="edge edge-back" d="M695,174 C695,240 255,240 255,118" marker-end="url(#ah)" />
+                        <text class="el" x="160" y="62">组长派活</text>
+                        <text class="el" x="353" y="62">剪辑交片</text>
+                        <text class="el" x="580" y="30">两签通过</text>
+                        <text class="el" x="578" y="178">任一打回</text>
+                        <text class="el el-back" x="475" y="232">写意见，剪辑收到红色通知，改完重传</text>
+                      </svg>
+                    </div>
+                    <figcaption>三种角色：创意建行，组长派活和审核，剪辑交片。每个箭头都自动通知下一环节的人。</figcaption>
+                  </figure>
+                )}
+
+                {it.diagram?.kind === 'gallery' && (
+                  <figure class="d-gallery">
+                    <div class="gal" tabindex="0" aria-label="操作说明视频分镜，可横向滑动">
+                      {GALLERY.map(([n, cap]) => (
+                        <figure class="shot">
+                          <img src={url(`works-media/script-desk/${n}.jpg`)} alt={cap} loading="lazy" width="1280" height="720" />
+                          <figcaption><span class="shot-n">{n}</span>{cap}</figcaption>
+                        </figure>
+                      ))}
+                    </div>
+                    <figcaption class="gal-cap">横向滑动看全部 12 步。原片约 90 秒。</figcaption>
+                  </figure>
+                )}
+
+                {it.flow && (
+                  <ol class="flow" aria-label="工作流">
+                    {it.flow.map((f) => <li>{f}</li>)}
+                  </ol>
+                )}
+
                 <ul class="result">
                   {it.result.map((r) => <li>{r}</li>)}
                 </ul>
@@ -305,13 +550,16 @@ const counts = [
     }
 
     <p class="note">
-      数字口径：计数来自系统记录或本人统计（已注明）；出单为平台归因。公开页不放金额，成本只给比例。
+      数字口径：计数来自系统记录或本人统计（已注明）；出单为平台归因。公开页不放金额，成本只给比例；团队流程里的人写成角色，说明视频里的人名和数字是示意。
     </p>
   </article>
 </Base>
 
 <style>
   .aiwf {
+    --ok: #1f9d55;
+    --warn: #e07a00;
+    --bad: var(--wrong);
     padding-block: 8px 48px;
   }
   .hero {
@@ -336,7 +584,6 @@ const counts = [
   }
   .lede {
     max-width: 40em;
-    color: var(--ink);
     margin: 0 0 24px;
   }
   .counts {
@@ -416,7 +663,7 @@ const counts = [
     margin: 0 0 10px;
   }
   .problem {
-    margin: 0 0 14px;
+    margin: 0 0 16px;
   }
   .tag {
     display: inline-block;
@@ -430,6 +677,283 @@ const counts = [
     border-radius: 3px;
     vertical-align: 2px;
   }
+  figure {
+    margin: 0;
+  }
+
+  /* 纵向流程：左侧角色，右侧节点，节点之间一条竖线 */
+  .d-steps {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    display: grid;
+    gap: 0;
+  }
+  .d-steps li {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 10px;
+    position: relative;
+    padding-bottom: 14px;
+  }
+  .d-steps li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: calc(64px + 10px + 13px);
+    top: 30px;
+    bottom: 0;
+    border-left: 2px solid var(--field);
+    opacity: 0.35;
+  }
+  .who {
+    align-self: start;
+    margin-top: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.3;
+    color: var(--ink-soft);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  .node {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px 0 0 30px;
+    position: relative;
+  }
+  .node::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 10px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 3px solid var(--field);
+  }
+  .node-t {
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .auto,
+  .back {
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .auto {
+    background: var(--light);
+    color: var(--ink);
+  }
+  .back {
+    border: 1px dashed var(--bad);
+    color: var(--ink);
+  }
+  .auto b,
+  .back b {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 400;
+    margin-right: 8px;
+    padding: 0 5px;
+    border-radius: 3px;
+    color: var(--card);
+  }
+  .auto b {
+    background: var(--field);
+  }
+  .back b {
+    background: var(--bad);
+  }
+
+  /* 分层架构 */
+  .d-layers {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .layer {
+    display: grid;
+    grid-template-columns: minmax(84px, 120px) minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 4px;
+    background: var(--light);
+    border-left: 4px solid var(--field);
+  }
+  .layer-n {
+    font-weight: 700;
+    color: var(--field);
+  }
+  .layer-d {
+    font-size: 15px;
+    min-width: 0;
+  }
+  .d-layers figcaption,
+  .d-states figcaption,
+  .gal-cap {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  /* 扇出 */
+  .d-fan {
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+    margin-bottom: 16px;
+  }
+  .fan-src,
+  .fan-sink {
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-align: center;
+    max-width: 100%;
+  }
+  .fan-src {
+    background: var(--ink);
+    color: var(--card);
+  }
+  .fan-sink {
+    background: var(--marker);
+    color: var(--ink);
+  }
+  .fan-mid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 8px;
+    padding-block: 18px;
+    position: relative;
+  }
+  .fan-mid::before,
+  .fan-mid::after {
+    content: '↓';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--ink-soft);
+    line-height: 1;
+  }
+  .fan-mid::before {
+    top: 0;
+  }
+  .fan-mid::after {
+    bottom: 0;
+  }
+  .fan-b {
+    min-width: 0;
+    padding: 8px 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid var(--field);
+    border-radius: 4px;
+    background: var(--card);
+  }
+
+  /* 状态机 */
+  .d-states {
+    margin-bottom: 16px;
+  }
+  .svg-scroll {
+    overflow-x: auto;
+  }
+  .svg-scroll svg {
+    display: block;
+    width: 100%;
+    min-width: 620px;
+    height: auto;
+  }
+  .st rect {
+    stroke-width: 2;
+  }
+  .st text {
+    font-size: 17px;
+    font-weight: 700;
+    text-anchor: middle;
+    font-family: var(--font-body);
+  }
+  .st-gray rect { fill: var(--light); stroke: var(--ink-soft); }
+  .st-gray text { fill: var(--ink-soft); }
+  .st-blue rect { fill: var(--card); stroke: var(--field); }
+  .st-blue text { fill: var(--field); }
+  .st-orange rect { fill: var(--card); stroke: var(--warn); }
+  .st-orange text { fill: var(--warn); }
+  .st-green rect { fill: var(--card); stroke: var(--ok); }
+  .st-green text { fill: var(--ok); }
+  .st-red rect { fill: var(--card); stroke: var(--bad); }
+  .st-red text { fill: var(--bad); }
+  .edge {
+    fill: none;
+    stroke: var(--ink-soft);
+    stroke-width: 2;
+  }
+  .edge-back {
+    stroke: var(--bad);
+    stroke-dasharray: 6 5;
+  }
+  .ah {
+    fill: var(--ink-soft);
+  }
+  .el {
+    font-size: 13px;
+    fill: var(--ink);
+    text-anchor: middle;
+    font-family: var(--font-body);
+  }
+  .el-back {
+    fill: var(--bad);
+  }
+
+  /* 分镜画廊 */
+  .d-gallery {
+    margin-bottom: 16px;
+  }
+  .gal {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(260px, 78%);
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+  }
+  .gal:focus-visible {
+    outline: 2px solid var(--field);
+    outline-offset: 2px;
+  }
+  .shot {
+    scroll-snap-align: start;
+    min-width: 0;
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--light);
+  }
+  .shot figcaption {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 6px;
+  }
+  .shot-n {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-right: 8px;
+  }
+
   .flow {
     list-style: none;
     padding: 0;
@@ -442,17 +966,12 @@ const counts = [
   .flow li {
     display: flex;
     align-items: center;
+    color: var(--field);
   }
   .flow li:not(:last-child)::after {
     content: '→';
     margin: 0 8px;
     color: var(--ink-soft);
-  }
-  .flow li {
-    color: var(--field);
-  }
-  .flow li > * {
-    min-width: 0;
   }
   .result {
     margin: 0 0 14px;
@@ -476,6 +995,17 @@ const counts = [
   @media (max-width: 480px) {
     .item {
       padding: 16px;
+    }
+    .d-steps li {
+      grid-template-columns: 48px minmax(0, 1fr);
+    }
+    .d-steps li:not(:last-child)::after {
+      left: calc(48px + 10px + 13px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gal {
+      scroll-behavior: auto;
     }
   }
 </style>
