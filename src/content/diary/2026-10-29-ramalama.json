@@ -1,0 +1,21 @@
+{
+  "no": "NO.18",
+  "slug": "ramalama",
+  "title": "用代码剪了一场走秀",
+  "pillar": "炫技卡点",
+  "status": "published",
+  "date": "2026-10-29",
+  "platforms": {
+    "xhs": {
+      "title": "纯代码（3D骨骼）实现的走秀现场",
+      "url": "https://www.xiaohongshu.com/explore/6ae3323d00000000250098aa",
+      "published_at": "2026-10-29T19:47:09+08:00"
+    },
+    "douyin": {
+      "title": "纯代码（3D骨骼）实现的走秀现场",
+      "url": "https://www.douyin.com/video/7702055657721444072",
+      "published_at": "2026-10-29T19:49:36+08:00"
+    }
+  },
+  "samples": []
+}

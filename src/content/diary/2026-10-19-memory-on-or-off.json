@@ -17,5 +17,90 @@
       "published_at": "2026-10-19T20:13:58+08:00"
     }
   },
-  "samples": []
+  "samples": [
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-10-20T15:53:58+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 19.69,
+      "bucket": "24h",
+      "label": "≈24h（实测 19.69h）",
+      "metrics": {
+        "likes": 1,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-10-20T15:54:02+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 19.67,
+      "bucket": "24h",
+      "label": "≈24h（实测 19.67h）",
+      "metrics": {
+        "likes": 7,
+        "collects": 0,
+        "comments": 2,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-10-22T09:54:44+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 61.7,
+      "bucket": "72h",
+      "label": "≈72h（实测 61.7h）",
+      "metrics": {
+        "likes": 1,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-10-22T09:54:47+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 61.68,
+      "bucket": "72h",
+      "label": "≈72h（实测 61.68h）",
+      "metrics": {
+        "likes": 8,
+        "collects": 0,
+        "comments": 2,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-10-25T21:56:04+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 145.72,
+      "bucket": "7d",
+      "label": "≈7d（实测 145.72h）",
+      "metrics": {
+        "likes": 1,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-10-25T21:56:07+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 145.7,
+      "bucket": "7d",
+      "label": "≈7d（实测 145.7h）",
+      "metrics": {
+        "likes": 8,
+        "collects": 0,
+        "comments": 2,
+        "shares": 0
+      }
+    }
+  ]
 }

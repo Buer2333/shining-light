@@ -1,0 +1,50 @@
+{
+  "no": "NO.16",
+  "slug": "contour",
+  "title": "关灯摸一下，就知道是不是可乐",
+  "pillar": "品牌拆解",
+  "status": "published",
+  "date": "2026-10-26",
+  "platforms": {
+    "xhs": {
+      "title": "100年前，可口可乐都被抄麻了",
+      "url": "https://www.xiaohongshu.com/explore/6adf46a7000000001500a2c4",
+      "published_at": "2026-10-26T20:25:11+08:00"
+    },
+    "douyin": {
+      "title": "关灯摸一下就知道是不是可乐 #Shining #品牌拆解 #品牌营销 #商标",
+      "url": "https://www.douyin.com/video/7700952238294529728",
+      "published_at": "2026-10-26T20:27:47+08:00"
+    }
+  },
+  "samples": [
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-10-27T15:57:49+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 19.54,
+      "bucket": "24h",
+      "label": "≈24h（实测 19.54h）",
+      "metrics": {
+        "likes": 0,
+        "collects": 1,
+        "comments": 0,
+        "shares": 1
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-10-27T15:57:51+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 19.5,
+      "bucket": "24h",
+      "label": "≈24h（实测 19.5h）",
+      "metrics": {
+        "likes": 3,
+        "collects": 0,
+        "comments": 3,
+        "shares": 0
+      }
+    }
+  ]
+}

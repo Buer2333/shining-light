@@ -17,5 +17,62 @@
       "published_at": "2026-10-24T21:24:40+08:00"
     }
   },
-  "samples": []
+  "samples": [
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-10-25T15:55:57+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 18.54,
+      "bucket": "24h",
+      "label": "≈24h（实测 18.54h）",
+      "metrics": {
+        "likes": 30,
+        "collects": 14,
+        "comments": 0,
+        "shares": 1
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-10-25T15:56:00+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 18.52,
+      "bucket": "24h",
+      "label": "≈24h（实测 18.52h）",
+      "metrics": {
+        "likes": 8,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-10-27T09:57:43+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 60.57,
+      "bucket": "72h",
+      "label": "≈72h（实测 60.57h）",
+      "metrics": {
+        "likes": 31,
+        "collects": 15,
+        "comments": 0,
+        "shares": 1
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-10-27T09:57:46+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 60.55,
+      "bucket": "72h",
+      "label": "≈72h（实测 60.55h）",
+      "metrics": {
+        "likes": 8,
+        "collects": 0,
+        "comments": 0,
+        "shares": 1
+      }
+    }
+  ]
 }
