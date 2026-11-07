@@ -31,6 +31,7 @@ const nav = [
     <meta name="referrer" content="no-referrer" />
     <meta name="theme-color" content="#FFF7E9" />
     <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title="Shining" href={url('rss.xml')} />
     <title>{fullTitle}</title>
   </head>
   <body>
@@ -54,6 +55,7 @@ const nav = [
     </main>
     <footer class="wrap site-footer">
       <p class="meta"><em>shining a light on what matters</em></p>
+      <p class="meta"><a href={url('rss.xml')}>RSS 订阅</a></p>
     </footer>
   </body>
 </html>
