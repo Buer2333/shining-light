@@ -2,8 +2,8 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  // GitHub Pages project site: https://<user>.github.io/shining-light/
-  base: '/shining-light',
+  // GitHub Pages with a custom domain: the site lives at the root of https://shiningforu.com/
+  site: 'https://shiningforu.com',
   output: 'static',
   trailingSlash: 'ignore',
 });
