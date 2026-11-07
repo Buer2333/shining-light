@@ -8,20 +8,22 @@ const brandlab = await getCollection('brandlab');
 const works = await getCollection('works');
 
 const sections = [
+  ['works/', 'Motion 作品', '每一期是怎么改出来的。视频本体在平台上，这里只放过程。', works.length],
+  ['guides/', '方法与教程', '提示词生成路径、代码教程，从一句话到一条动效视频。', null],
   ['diary/', '发布日记', '每期发出去之后的数据：按实测小时数记录，没采到就写「未采」，不估不补。', diary.length],
-  ['brandlab/', '品牌拆解库', '一个品牌一页：它的广告创意里，真正起作用的是哪一处。', brandlab.length],
-  ['works/', '作品', '每一期是怎么改出来的。视频本体在平台上，这里只放过程。', works.length],
-  ['resume/', '简历设计路径', '整理中。', null],
+  ['agents/', 'AI Agent 与 Harness', '用 AI Agent 干活的心得，和把规则落到动作上的架构设计。', null],
+  ['brandlab/', '品牌增长案例', '品牌、运营、广告和内容营销：真正起作用的是哪一处。', brandlab.length],
+  ['projects/', '开源项目', '做这些事时沉淀下来、公开在 GitHub 上的工具。', null],
 ] as const;
 ---
 
 <Base>
   <section class="hero">
-    <p class="meta">SHINING · HIGHLIGHT</p>
-    <h1>拆大牌广告创意，<span class="hl">照亮最要紧的那一处</span>。</h1>
+    <p class="meta">SHINING · MOTION</p>
+    <h1>用代码和 AI，把内容做成<span class="hl">能复用的系统</span>。</h1>
     <p class="lead">
-      我是 Shining，一个写过代码的电商操盘手。每一期挑一个品牌或一件业务里的事，在一大堆细节里只划一处重点。
-      这个站是公开的工作笔记：发了什么、数据怎么样、拆过哪些品牌、作品怎么一版版改过来。
+      我是 Shining，一个写过代码的电商操盘手。这个站是公开的工作笔记：动效视频怎么用代码做出来，
+      AI Agent 怎么真正用起来，品牌增长的事怎么想、怎么做，以及每期发出去之后的数据。
     </p>
   </section>
 

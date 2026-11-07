@@ -8,14 +8,17 @@ interface Props {
   description?: string;
 }
 
-const { title, description = 'Shining · 拆大牌广告创意，照亮最要紧的那一处。' } = Astro.props;
+const { title, description = 'Shining · 用代码和 AI 做动效、搭 Agent、做品牌增长的公开工作笔记。' } = Astro.props;
 const fullTitle = title ? `${title} · Shining` : 'Shining';
 const path = Astro.url.pathname;
 const nav = [
+  ['works/', 'Motion 作品'],
+  ['guides/', '方法与教程'],
   ['diary/', '发布日记'],
-  ['brandlab/', '品牌拆解库'],
-  ['works/', '作品'],
-  ['resume/', '简历设计路径'],
+  ['agents/', 'AI Agent 与 Harness'],
+  ['brandlab/', '品牌增长案例'],
+  ['projects/', '开源项目'],
+  ['resume/', '关于'],
 ] as const;
 ---
 
@@ -34,7 +37,7 @@ const nav = [
     <header class="site-header">
       <div class="wrap bar">
         <a class="wordmark" href={url()}>Shining</a>
-        <span class="meta series">HIGHLIGHT</span>
+        <span class="meta series">MOTION</span>
       </div>
       <nav class="wrap nav" aria-label="栏目">
         {

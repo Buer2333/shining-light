@@ -1,0 +1,26 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const projects = [
+  ['shining-rig', 'https://github.com/Buer2333/shining-rig', 'Remotion 用的 2D 角色骨骼库：拆件、网格蒙皮，支持关键帧和从视频提取的动作。'],
+  ['claude-guardrails', 'https://github.com/Buer2333/claude-guardrails', 'Claude Code 插件集：把规则从文档搬到动作发生的那一刻。'],
+  ['tiktok-gmvmax-mcp', 'https://github.com/Buer2333/tiktok-gmvmax-mcp', 'TikTok Business API 的只读 MCP 服务器，重点支持 GMV Max。'],
+] as const;
+---
+
+<Base title="开源项目" description="Shining 公开在 GitHub 上的工具。">
+  <h1>开源项目</h1>
+  <p class="muted">做这些事时沉淀下来的工具。</p>
+  <ul class="list">
+    {
+      projects.map(([name, href, desc]) => (
+        <li class="card">
+          <a class="title" href={href}>
+            {name}
+          </a>
+          <p class="muted">{desc}</p>
+        </li>
+      ))
+    }
+  </ul>
+</Base>

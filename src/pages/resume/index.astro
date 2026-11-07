@@ -1,8 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { url } from '../../lib/site';
 ---
 
-<Base title="简历设计路径">
-  <h1>简历设计路径</h1>
-  <p class="empty">整理中。</p>
+<Base title="关于" description="关于 Shining。">
+  <h1>关于</h1>
+  <p>我是 Shining，一个写过代码的电商操盘手。现在主要用代码和 AI 做动效短视频、搭 Agent 工作流、做品牌增长。</p>
+  <ul>
+    <li><a href={url('resume/ai-workflows/')}>我的 AI 工作流</a></li>
+    <li><a href="https://github.com/Buer2333">GitHub</a></li>
+  </ul>
 </Base>

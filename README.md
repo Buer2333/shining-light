@@ -1,8 +1,8 @@
-# shining-light
+# shining-motion
 
-Shining 的公开工作笔记：拆大牌广告创意，照亮最要紧的那一处。
+Shining 的公开工作笔记，线上地址 [shiningforu.com](https://shiningforu.com)：用代码和 AI 做动效、搭 Agent、做品牌增长。
 
-栏目：发布日记 · 品牌拆解库 · 作品 · 简历设计路径（整理中）。
+栏目：Motion 作品 · 方法与教程 · 发布日记 · AI Agent 与 Harness · 品牌增长案例 · 开源项目 · 关于。
 
 ## 开发
 
