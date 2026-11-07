@@ -4,6 +4,10 @@ Shining 的公开工作笔记，线上地址 [shiningforu.com](https://shiningfo
 
 栏目：Motion 作品 · 方法与教程 · 发布日记 · AI Agent 与 Harness · 品牌增长案例 · 开源项目 · 关于。
 
+## 方法
+
+[`skills/motion`](skills/motion/SKILL.md)：用代码做动效短视频的方法，可以当 Agent skill 用，也可以直接读。
+
 ## 开发
 
 ```sh
