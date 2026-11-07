@@ -8,6 +8,11 @@ Shining 的公开工作笔记，线上地址 [shiningforu.com](https://shiningfo
 
 [`skills/motion`](skills/motion/SKILL.md)：用代码做动效短视频的方法，可以当 Agent skill 用，也可以直接读。
 
+## 代码
+
+- [`packages/kit`](packages/kit)：Remotion 动效小组件，MIT
+- [`examples/hello-motion`](examples/hello-motion)：可运行的示例，全部由代码绘制
+
 ## 开发
 
 ```sh
