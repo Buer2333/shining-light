@@ -5,7 +5,8 @@
 # Scans every commit in the range: author/committer emails (must be noreply), added lines (local paths, hostnames,
 # emails, key/token shapes, long base64 runs) and every object (non-text blobs outside the allow-list, blobs > 1 MB).
 set -uo pipefail
-cd "$(git rev-parse --show-toplevel)"
+TOP="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)" || { echo "public_scan: not inside a git checkout" >&2; exit 2; }
+cd "${TOP}" || exit 2
 if [ -n "${1:-}" ]; then RANGE="$1"
 elif git rev-parse --verify -q origin/main >/dev/null; then RANGE="origin/main..HEAD"
 else RANGE="HEAD"; fi
