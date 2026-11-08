@@ -1,9 +1,15 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { POST_COLUMNS } from '../../lib/site';
+
+const c = POST_COLUMNS.agents;
+const entries = await getCollection('agents');
 ---
 
-<Base title="AI Agent 与 Harness" description="用 AI Agent 干活的心得，和 harness 架构设计。">
-  <h1>AI Agent 与 Harness</h1>
-  <p class="muted">用 AI Agent 干活的心得，以及怎么把规则落到动作上。</p>
-  <p class="empty">整理中。</p>
+<Base title={c.title} description={c.blurb}>
+  <h1>{c.title}</h1>
+  <p class="muted">{c.blurb}</p>
+  <PostList column="agents" entries={entries} />
 </Base>

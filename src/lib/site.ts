@@ -27,6 +27,12 @@ export const MISSING = '未采';
 export const FAIL_TAG = '翻车复盘';
 export const tagPath = (t: string) => `tags/${encodeURIComponent(t)}/`;
 
+/** 方法与教程 / AI Agent 与 Harness share one page shape. */
+export const POST_COLUMNS = {
+  guides: { title: '方法与教程', blurb: '提示词怎么生成，代码怎么写，一句话怎么变成一条动效视频。' },
+  agents: { title: 'AI Agent 与 Harness', blurb: '用 AI Agent 干活的心得，以及怎么把规则落到动作上。' },
+} as const;
+
 type SampleLike = { platform: string; bucket: string; likes: number | null; collects: number | null };
 
 /** 「小红书 ≈72h：点赞 12 · 收藏 3」 per platform, from the latest bucketed sample. Numbers only; null → skipped. */

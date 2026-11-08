@@ -3,10 +3,14 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { FAIL_TAG, firstPublished, fmtDate, url } from '../../lib/site';
 
-// One page per tag, across 发布日记 and 品牌增长案例. 「翻车复盘」 always exists (empty state if nothing yet).
+// One page per tag, across 发布日记, 品牌增长案例, 方法与教程 and AI Agent 与 Harness. 「翻车复盘」 always exists (empty state if nothing yet).
 export async function getStaticPaths() {
   const diary = (await getCollection('diary')).filter((e) => e.data.public);
   const cases = await getCollection('brandlab');
+  const posts = [
+    ...(await getCollection('guides')).map((e) => ({ e, col: 'guides', kind: '方法与教程' })),
+    ...(await getCollection('agents')).map((e) => ({ e, col: 'agents', kind: 'AI Agent 与 Harness' })),
+  ];
   const items = [
     ...diary.map((e) => ({
       tags: e.data.tags,
@@ -20,6 +24,13 @@ export async function getStaticPaths() {
       title: e.data.title,
       href: `brandlab/${e.id}/`,
       kind: '品牌增长案例',
+      date: fmtDate(e.data.date),
+    })),
+    ...posts.map(({ e, col, kind }) => ({
+      tags: e.data.tags,
+      title: e.data.title,
+      href: `${col}/${e.id}/`,
+      kind,
       date: fmtDate(e.data.date),
     })),
   ];

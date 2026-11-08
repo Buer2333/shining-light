@@ -7,6 +7,8 @@
 | `diary/` | 发布日记 | `{文件名}.json`（也接受 `.md`） | `/diary/`、`/diary/{slug}/` |
 | `brandlab/` | 品牌拆解库 | `{slug}.md` | `/brandlab/`、`/brandlab/{slug}/` |
 | `works/` | 作品 | `{slug}.json`（也接受 `.md`） | `/works/`（锚点 `#{slug}`） |
+| `guides/` | 方法与教程 | `{slug}.md`（只有私有仓里批准过的文章才会导出） | `/guides/`、`/guides/{slug}/` |
+| `agents/` | AI Agent 与 Harness | `{slug}.md`（同上） | `/agents/`、`/agents/{slug}/` |
 | `resume/` | 简历设计路径 | `index.md`，导出脚本写固定占位（`status: placeholder`） | `/resume/` 固定为「整理中」占位页 |
 | `_samples/` | 合成示例 | 每个集合一条假数据 | 只在 `SITE_INCLUDE_SAMPLES=1` 时加载；CI 生产构建不设，示例不会进 `dist/` |
 
@@ -68,6 +70,18 @@ date: 2026-10-07                # YYYY-MM-DD
 summary: string                 # 一两句，列表页和搜索用（导出脚本取「一句话看点」首段，≤120 字）
 ```
 正文：markdown（只放学习层结论，不放内部数据）。
+
+两种来源：品牌拆解（调研笔记导出，`tags` 带「品牌拆解」）和本人实操案例（私有仓 `ip/blog/cases/` 里批准过的，`tags` 带「我的实操」；品牌和公司不点名）。
+
+## guides / agents（方法与教程 / AI Agent 与 Harness）
+
+```yaml
+title: string
+date: 2026-11-08
+summary: string
+tags: [string, ...]
+```
+正文：markdown。
 
 ## works（作品）
 

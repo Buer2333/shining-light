@@ -1,0 +1,37 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { POST_COLUMNS, fmtDate, tagPath, url } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('agents');
+  return entries.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+---
+
+<Base title={d.title} description={d.summary}>
+  <p class="meta">
+    <a href={url('agents/')}>← {POST_COLUMNS.agents.title}</a> · {fmtDate(d.date)}
+    {d.sample && ' · 示例数据'}
+  </p>
+  <h1>{d.title}</h1>
+  <p class="muted">{d.summary}</p>
+  {
+    d.tags.length > 0 && (
+      <p>
+        {d.tags.map((t) => (
+          <a class="tag" href={url(tagPath(t))}>
+            {t}
+          </a>
+        ))}
+      </p>
+    )
+  }
+  <article class="prose">
+    <Content />
+  </article>
+</Base>

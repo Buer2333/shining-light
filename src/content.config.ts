@@ -112,6 +112,23 @@ const works = defineCollection({
   }),
 });
 
+// 方法与教程 / AI Agent 与 Harness：导出脚本只写用户批准过的文章（personal ip/blog/{guides,agents}，status: approved）。
+const post = z.object({
+  title: z.string(),
+  date: z.coerce.date(),
+  summary: z.string(),
+  tags: z.array(z.string()).default([]),
+  sample: z.boolean().default(false),
+});
+const guides = defineCollection({
+  loader: glob({ base: './src/content', pattern: patterns('guides', 'md'), generateId: idFromFile }),
+  schema: post,
+});
+const agents = defineCollection({
+  loader: glob({ base: './src/content', pattern: patterns('agents', 'md'), generateId: idFromFile }),
+  schema: post,
+});
+
 // Placeholder only — the resume timeline ships in a later, separately approved push.
 const resume = defineCollection({
   loader: glob({ base: './src/content', pattern: patterns('resume', 'md'), generateId: idFromFile }),
@@ -122,4 +139,4 @@ const resume = defineCollection({
   }),
 });
 
-export const collections = { diary, brandlab, works, resume };
+export const collections = { diary, brandlab, works, resume, guides, agents };

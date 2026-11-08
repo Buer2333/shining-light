@@ -1,9 +1,15 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { POST_COLUMNS } from '../../lib/site';
+
+const c = POST_COLUMNS.guides;
+const entries = await getCollection('guides');
 ---
 
-<Base title="方法与教程" description="提示词生成路径和代码教程，从一句话到一条动效视频。">
-  <h1>方法与教程</h1>
-  <p class="muted">提示词怎么生成，代码怎么写，一句话怎么变成一条动效视频。</p>
-  <p class="empty">整理中。</p>
+<Base title={c.title} description={c.blurb}>
+  <h1>{c.title}</h1>
+  <p class="muted">{c.blurb}</p>
+  <PostList column="guides" entries={entries} />
 </Base>

@@ -2,7 +2,7 @@
 title: "Dove「Real Beauty Sketches」（2013）"
 brand: "Dove"
 category: "日化 / 美妆"
-tags: []
+tags: ["品牌拆解"]
 summary: "一块香皂的广告，3 分钟里没提一句香皂，只让一位真警方素描师隔着帘子给女性画了两张像。它后来被 Unilever 宣称为当时史上播放最多的网络视频广告，并拿了戛纳钛狮全场大奖。"
 date: "2026-10-07"
 ---

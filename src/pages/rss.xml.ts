@@ -35,7 +35,17 @@ export async function GET({ site }: APIContext) {
       text: e.data.summary,
     }));
 
-  const items = [...diary, ...cases]
+  const posts = (
+    await Promise.all(
+      (['guides', 'agents'] as const).map(async (col) =>
+        (await getCollection(col))
+          .filter((e) => !e.data.sample)
+          .map((e) => ({ title: e.data.title, path: `${col}/${e.id}/`, date: e.data.date, text: e.data.summary })),
+      ),
+    )
+  ).flat();
+
+  const items = [...diary, ...cases, ...posts]
     .sort((a, b) => b.date.getTime() - a.date.getTime())
     .map(
       (i) => `    <item>

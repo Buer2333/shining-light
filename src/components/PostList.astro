@@ -1,0 +1,39 @@
+---
+import { fmtDate, tagPath, url } from '../lib/site';
+interface Props {
+  column: 'guides' | 'agents';
+  entries: { id: string; data: { title: string; date: Date; summary: string; tags: string[]; sample: boolean } }[];
+}
+const { column, entries } = Astro.props;
+const sorted = [...entries].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+{
+  sorted.length === 0 ? (
+    <p class="empty">整理中。</p>
+  ) : (
+    <ul class="list">
+      {sorted.map((e) => (
+        <li class="card">
+          <p class="meta">
+            {fmtDate(e.data.date)}
+            {e.data.sample && ' · 示例数据'}
+          </p>
+          <a class="title" href={url(`${column}/${e.id}/`)}>
+            {e.data.title}
+          </a>
+          <p>{e.data.summary}</p>
+          {e.data.tags.length > 0 && (
+            <p>
+              {e.data.tags.map((t) => (
+                <a class="tag" href={url(tagPath(t))}>
+                  {t}
+                </a>
+              ))}
+            </p>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}
