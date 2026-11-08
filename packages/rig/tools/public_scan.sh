@@ -38,7 +38,10 @@ while read -r obj path; do
   if ! echo "${path}" | grep -q -E "${ALLOW}"; then hit "file type not allowed: ${path}"; fi
   nonul=$(git cat-file -p "${obj}" | LC_ALL=C tr -d '\000' | wc -c | tr -d ' ')
   [ "${nonul}" != "${size}" ] && hit "binary content (NUL bytes): ${path}"
-done < <(git rev-list --objects ${RANGE} -- packages/ | awk 'NF==2')
+done < <(git rev-list --objects ${RANGE} -- packages/ | awk 'NF==2'
+         # plus every blob under packages/ at HEAD: a blob first committed elsewhere (e.g. a site image) and then
+         # copied into packages/ is reachable from before the range, so the range listing alone skips it
+         git ls-tree -r HEAD -- packages/ | awk -F'\t' '{split($1, m, " "); print m[3], $2}')
 
 echo "${FIND} findings"
 [ "${FIND}" = 0 ]
