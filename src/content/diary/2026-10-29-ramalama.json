@@ -17,5 +17,90 @@
       "published_at": "2026-10-29T19:49:36+08:00"
     }
   },
-  "samples": []
+  "samples": [
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-10-30T13:58:46+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 18.19,
+      "bucket": "24h",
+      "label": "≈24h（实测 18.19h）",
+      "metrics": {
+        "likes": 1,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-10-30T13:58:48+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 18.15,
+      "bucket": "24h",
+      "label": "≈24h（实测 18.15h）",
+      "metrics": {
+        "likes": 2,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-11-01T07:59:13+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 60.2,
+      "bucket": "72h",
+      "label": "≈72h（实测 60.2h）",
+      "metrics": {
+        "likes": 1,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-11-01T07:59:15+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 60.16,
+      "bucket": "72h",
+      "label": "≈72h（实测 60.16h）",
+      "metrics": {
+        "likes": 2,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-11-04T21:38:56+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 145.86,
+      "bucket": "7d",
+      "label": "≈7d（实测 145.86h）",
+      "metrics": {
+        "likes": 1,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-11-04T21:39:01+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 145.82,
+      "bucket": "7d",
+      "label": "≈7d（实测 145.82h）",
+      "metrics": {
+        "likes": 4,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    }
+  ]
 }

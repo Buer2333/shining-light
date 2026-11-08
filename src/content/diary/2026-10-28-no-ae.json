@@ -17,5 +17,90 @@
       "published_at": "2026-10-28T12:55:26+08:00"
     }
   },
-  "samples": []
+  "samples": [
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-10-29T07:58:09+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 19.08,
+      "bucket": "24h",
+      "label": "≈24h（实测 19.08h）",
+      "metrics": {
+        "likes": 0,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-10-29T07:58:16+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 19.05,
+      "bucket": "24h",
+      "label": "≈24h（实测 19.05h）",
+      "metrics": {
+        "likes": 7,
+        "collects": 0,
+        "comments": 3,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-10-31T01:59:04+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 61.09,
+      "bucket": "72h",
+      "label": "≈72h（实测 61.09h）",
+      "metrics": {
+        "likes": 0,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-10-31T01:59:06+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 61.06,
+      "bucket": "72h",
+      "label": "≈72h（实测 61.06h）",
+      "metrics": {
+        "likes": 8,
+        "collects": 0,
+        "comments": 3,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-11-03T13:38:44+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 144.75,
+      "bucket": "7d",
+      "label": "≈7d（实测 144.75h）",
+      "metrics": {
+        "likes": 1,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-11-03T13:38:48+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 144.72,
+      "bucket": "7d",
+      "label": "≈7d（实测 144.72h）",
+      "metrics": {
+        "likes": 8,
+        "collects": 0,
+        "comments": 3,
+        "shares": 0
+      }
+    }
+  ]
 }
