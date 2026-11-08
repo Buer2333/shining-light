@@ -12,6 +12,7 @@ import {
   fmtDate,
   fmtMetric,
   sampleLabel,
+  tagPath,
   url,
 } from '../../lib/site';
 
@@ -40,6 +41,17 @@ const points = (p: string) =>
     {d.sample && ' · 示例数据'}
   </p>
   <h1>{d.title}</h1>
+  {
+    d.tags.length > 0 && (
+      <p>
+        {d.tags.map((t) => (
+          <a class="tag" href={url(tagPath(t))}>
+            {t}
+          </a>
+        ))}
+      </p>
+    )
+  }
 
   {
     platforms.map((p) => {

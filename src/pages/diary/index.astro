@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import DiaryChart, { type Row } from '../../components/DiaryChart.astro';
-import { PLATFORM_LABEL, STATUS_LABEL, firstPublished, fmtDate, url } from '../../lib/site';
+import { PLATFORM_LABEL, STATUS_LABEL, dataSummary, firstPublished, fmtDate, tagPath, url } from '../../lib/site';
 
 const entries = (await getCollection('diary'))
   .filter((e) => e.data.public)
@@ -62,6 +62,18 @@ const rows: Row[] = entries.flatMap((e) =>
                   .join(' / ')}{' '}
                 · 采样 {e.data.samples.length} 次
               </p>
+              {dataSummary(e.data.samples).map((line) => (
+                <p class="meta">{line}</p>
+              ))}
+              {e.data.tags.length > 0 && (
+                <p>
+                  {e.data.tags.map((t) => (
+                    <a class="tag" href={url(tagPath(t))}>
+                      {t}
+                    </a>
+                  ))}
+                </p>
+              )}
             </li>
           );
         })}

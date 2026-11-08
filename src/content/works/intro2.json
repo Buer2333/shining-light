@@ -1,0 +1,27 @@
+{
+  "no": "INTRO",
+  "title": "用AI做自媒体IP，真的太爽了",
+  "slug": "intro2",
+  "iterations": [
+    {
+      "tag": "intro2-v2",
+      "date": "10-08 夜跑",
+      "note": "复审 r1 修：竖版 s04 卡摞挡脸、s07 章停留过短（check_vo_read 新增 goneAt 离场时刻，堵…"
+    },
+    {
+      "tag": "intro2-v3.2",
+      "date": "10-08",
+      "note": "修 r1 MAJOR：标题后空画面 2.27s→0.40s"
+    },
+    {
+      "tag": "intro2-v4.1",
+      "date": "10-08",
+      "note": "复审 r1（std 1 MAJOR / 画像 4 MAJOR）修：照后床抬 + s06b「写」人声 +6 dB，照后 0…"
+    },
+    {
+      "tag": "intro2-v4.2",
+      "date": "10-08",
+      "note": "只改混音（画面流同 v4.1）：人声下床宽带 −8.5 dB + 1–4 kHz 再 −8.5 dB（保持 280 ms…"
+    }
+  ]
+}

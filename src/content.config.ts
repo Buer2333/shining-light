@@ -77,6 +77,8 @@ const diary = defineCollection({
     samples: z.array(sample).default([]),
     retro: z.string().default(''),
     comments_notes: z.array(z.string()).default([]),
+    // 导出脚本写：日记 front matter 的 tags，加上 pillar=真实翻车 自动带的「翻车复盘」
+    tags: z.array(z.string()).default([]),
     public: z.boolean().default(true),
     sample: z.boolean().default(false), // true only in src/content/_samples/
   }),

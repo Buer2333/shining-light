@@ -23,6 +23,31 @@ export const METRICS = [
 
 export const MISSING = '未采';
 
+/** Cross-collection tag for post-mortems (exporter adds it to pillar 真实翻车). */
+export const FAIL_TAG = '翻车复盘';
+export const tagPath = (t: string) => `tags/${encodeURIComponent(t)}/`;
+
+type SampleLike = { platform: string; bucket: string; likes: number | null; collects: number | null };
+
+/** 「小红书 ≈72h：点赞 12 · 收藏 3」 per platform, from the latest bucketed sample. Numbers only; null → skipped. */
+export const dataSummary = (samples: SampleLike[]) =>
+  (['xhs', 'douyin'] as const).flatMap((p) => {
+    const s = [...BUCKETS]
+      .reverse()
+      .map((b) => samples.find((x) => x.platform === p && x.bucket === b))
+      .find(Boolean);
+    if (!s) return [];
+    const parts = (
+      [
+        ['likes', '点赞'],
+        ['collects', '收藏'],
+      ] as const
+    )
+      .filter(([k]) => s[k] !== null && s[k] !== undefined)
+      .map(([k, label]) => `${label} ${s[k]!.toLocaleString('zh-CN')}`);
+    return parts.length ? [`${PLATFORM_LABEL[p]} ${BUCKET_LABEL[s.bucket]}：${parts.join(' · ')}`] : [];
+  });
+
 /** Internal link that respects the GitHub Pages base path. */
 export const url = (path = '') => {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');

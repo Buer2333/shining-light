@@ -44,8 +44,11 @@ samples:                        # 每次采样一条；没采到就不写
     followers_gained: null
 retro: ""                       # string
 comments_notes: []              # string[]
+tags: []                        # string[]，可缺省；pillar=真实翻车 时导出脚本自动加「翻车复盘」
 public: true
 ```
+
+页面展示：卡片列出标签，每个标签链到 `/tags/{标签}/`（跨发布日记和品牌增长案例）；卡片另有一行数据摘要，取每个平台最新一档的点赞、收藏，没采到的不写。
 
 **bucket 计算（导出脚本负责，站点不重算）**：
 - `24h`：hours ∈ [18, 30]；`72h`：hours ∈ [60, 84]；`7d`：hours ∈ [144, 192]；其余为 `point`。
@@ -74,7 +77,7 @@ title: string
 slug: string
 pillar: 同 diary                 # 可选（导出的 works 目前不带）
 notes: string                   # 可选，一句话说明
-iterations:                     # 导出脚本写，每版一条
+iterations:                     # 导出脚本写，每版一条；作品范围 = 固定的 ep02 / pilot-x05 + 已发布日记 version_tag 去掉 -vN 的前缀（episodes.md 没有行的跳过）
   - { tag: ep02-v4, date: "10-05", note: "…" }
 ```
 JSON 无正文；迭代过程由 `iterations` 渲染。手写 `.md` 时正文写 markdown。视频本体只链接到平台，不放文件。

@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { FAIL_TAG, firstPublished, fmtDate, url } from '../../lib/site';
+
+// One page per tag, across 发布日记 and 品牌增长案例. 「翻车复盘」 always exists (empty state if nothing yet).
+export async function getStaticPaths() {
+  const diary = (await getCollection('diary')).filter((e) => e.data.public);
+  const cases = await getCollection('brandlab');
+  const items = [
+    ...diary.map((e) => ({
+      tags: e.data.tags,
+      title: `${e.data.no} ${e.data.title}`,
+      href: `diary/${e.id}/`,
+      kind: '发布日记',
+      date: fmtDate(firstPublished(e.data.platforms)),
+    })),
+    ...cases.map((e) => ({
+      tags: e.data.tags,
+      title: e.data.title,
+      href: `brandlab/${e.id}/`,
+      kind: '品牌增长案例',
+      date: fmtDate(e.data.date),
+    })),
+  ];
+  const tags = new Set([FAIL_TAG, ...items.flatMap((i) => i.tags)]);
+  return [...tags].map((tag) => ({
+    params: { tag },
+    props: {
+      tag,
+      items: items.filter((i) => i.tags.includes(tag)).sort((a, b) => b.date.localeCompare(a.date)),
+    },
+  }));
+}
+
+const { tag, items } = Astro.props;
+const blurb =
+  tag === FAIL_TAG ? '做砸了的期和案例：哪里错了、怎么发现的、后来怎么改。' : `带「${tag}」标签的条目。`;
+---
+
+<Base title={`标签：${tag}`} description={blurb}>
+  <h1>{tag}</h1>
+  <p class="muted">{blurb}</p>
+  {
+    items.length === 0 ? (
+      <p class="empty">整理中。</p>
+    ) : (
+      <ul class="list">
+        {items.map((i) => (
+          <li class="card">
+            <p class="meta">
+              {i.kind}
+              {i.date && ` · ${i.date}`}
+            </p>
+            <a class="title" href={url(i.href)}>
+              {i.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</Base>
