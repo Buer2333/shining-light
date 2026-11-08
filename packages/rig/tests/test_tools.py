@@ -221,6 +221,24 @@ def test_provenance_rules(tmp_path, monkeypatch):
     assert provenance.generator(stamp=False) == "unstamped"
 
 
+def test_provenance_scoped_to_library_dir(tmp_path, monkeypatch):
+    repo = tmp_path / "m"
+    lib = repo / "packages" / "rig"
+    lib.mkdir(parents=True)
+    g = lambda *a: subprocess.run(["git", "-C", str(repo), *a], check=True, capture_output=True, text=True).stdout.strip()
+    g("init", "-q"); g("config", "user.email", "t@example.com"); g("config", "user.name", "t")
+    (lib / "a").write_text("1"); g("add", "-A"); g("commit", "-qm", "lib")
+    lib_sha = g("rev-parse", "HEAD")
+    g("tag", "v1.0.0")
+    (repo / "post.md").write_text("x"); g("add", "-A"); g("commit", "-qm", "blog")
+    (repo / "draft.md").write_text("wip")
+    monkeypatch.setattr(provenance, "REPO", str(lib))
+    assert provenance.generator() == f"shining-rig@v1.0.0+{lib_sha}"
+    (lib / "a").write_text("2")
+    with pytest.raises(provenance.DirtyRepo):
+        provenance.generator()
+
+
 def test_track_angles_from_keypoints():
     rest = np.zeros((17, 2), np.float32)
     rest[[5, 6]] = [[300, 200], [200, 200]]  # shoulders (viewer right, left)

@@ -1,5 +1,8 @@
 # shining-rig
 
+> Lives in [shining-motion](https://github.com/Buer2333/shining-motion) under `packages/rig` since 2026-11-07, moved from
+> `Buer2333/shining-rig` with its full history: tags `v0.1.0` and `v0.2.0` and every `shining-rig@…+<sha>` stamp still resolve here.
+
 2D character rig for [Remotion](https://www.remotion.dev): cut a single front-view character drawing into parts,
 animate it with keyframe clips or with pose tracks extracted from video, and render limbs either as rigid cutout
 parts or as mesh-skinned sheets that bend without seams.

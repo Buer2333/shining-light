@@ -8,6 +8,10 @@
 4. Re-sync from the tag (`VERSION` becomes `<tag> <sha>`; the sha must not change) and record `tag → sha` in the
    project's version ledger. Artifacts generated at the candidate keep their candidate stamp.
 
+In this repo the `v*` tags belong to `packages/rig`. "Clean" and "the same sha" are about this directory: blog commits
+elsewhere in the repo do not make the library dirty, and the sync compares the library's `src/` tree at the tag with
+the one at HEAD.
+
 Rules: tags are never moved or recreated. The sync refuses a dirty or mismatched library checkout, never touches
 unrelated files in the target project, and stops if the vendored copy differs from the archive of the sha it was
 last synced from (someone edited it by hand).

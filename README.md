@@ -10,6 +10,7 @@ Shining 的公开工作笔记，线上地址 [shiningforu.com](https://shiningfo
 
 ## 代码
 
+- [`packages/rig`](packages/rig)：shining-rig，Remotion 用的 2D 角色骨骼库，MIT（2026-11-07 从 Buer2333/shining-rig 连历史并入）
 - [`packages/kit`](packages/kit)：Remotion 动效小组件，MIT
 - [`examples/hello-motion`](examples/hello-motion)：可运行的示例，全部由代码绘制
 
