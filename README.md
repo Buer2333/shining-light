@@ -1,18 +1,10 @@
-# shining-motion
+# shining-light
 
 Shining 的公开工作笔记，线上地址 [shiningforu.com](https://shiningforu.com)：用代码和 AI 做动效、搭 Agent、做品牌增长。
 
 栏目：Motion 作品 · 方法与教程 · 发布日记 · AI Agent 与 Harness · 品牌增长案例 · 开源项目 · 关于。
 
-## 方法
-
-[`skills/motion`](skills/motion/SKILL.md)：用代码做动效短视频的方法，可以当 Agent skill 用，也可以直接读。
-
-## 代码
-
-- [`packages/rig`](packages/rig)：shining-rig，Remotion 用的 2D 角色骨骼库，MIT（2026-11-07 从 Buer2333/shining-rig 连历史并入）
-- [`packages/kit`](packages/kit)：Remotion 动效小组件，MIT
-- [`examples/hello-motion`](examples/hello-motion)：可运行的示例，全部由代码绘制
+动效组件库、动效方法和示例在 [Buer2333/shining-motion](https://github.com/Buer2333/shining-motion)。
 
 ## 开发
 
