@@ -45,6 +45,34 @@
         "comments": 2,
         "shares": 0
       }
+    },
+    {
+      "platform": "xhs",
+      "sampled_at": "2026-11-14T07:40:44+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 61.19,
+      "bucket": "72h",
+      "label": "≈72h（实测 61.19h）",
+      "metrics": {
+        "likes": 0,
+        "collects": 0,
+        "comments": 0,
+        "shares": 0
+      }
+    },
+    {
+      "platform": "douyin",
+      "sampled_at": "2026-11-14T07:40:53+08:00",
+      "source": "tikhub",
+      "hours_since_publish": 61.17,
+      "bucket": "72h",
+      "label": "≈72h（实测 61.17h）",
+      "metrics": {
+        "likes": 19,
+        "collects": 3,
+        "comments": 2,
+        "shares": 0
+      }
     }
   ]
 }
